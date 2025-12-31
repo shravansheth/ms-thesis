@@ -60,8 +60,8 @@ scripts/run_pipeline_cpu.sh \
 ```
 
 This produces:
-	•	outputs/<name>/<name>.llvm_dialect.mlir
-	•	outputs/<name>/<name>.ll
+- outputs/<name>/<name>.llvm_dialect.mlir
+- outputs/<name>/<name>.ll
 
 Example:
 ```
