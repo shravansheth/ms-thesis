@@ -14,10 +14,6 @@ cat << 'EOF' > .gitignore
 *.tmp
 *.log
 
-# Outputs directory contents (keep structure, not data)
-outputs/*
-!outputs/.gitkeep
-
 # macOS junk
 .DS_Store
 

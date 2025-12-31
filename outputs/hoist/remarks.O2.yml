@@ -1,0 +1,61 @@
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        hoist_candidate
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        hoist_candidate
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            gvn
+Name:            LoadClobbered
+Function:        hoist_candidate
+Args:
+  - String:          'load of type '
+  - Type:            float
+  - String:          ' not eliminated'
+  - String:          ' because it is clobbered by '
+  - ClobberedBy:     store
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        hoist_candidate
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        hoist_candidate
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        hoist_candidate
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...
+--- !Missed
+Pass:            slp-vectorizer
+Name:            NotPossible
+Function:        hoist_candidate
+Args:
+  - String:          'Cannot SLP vectorize list: vectorization was impossible'
+  - String:          ' with available vectorization factors'
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        hoist_candidate
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...

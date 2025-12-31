@@ -1,0 +1,22 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        hoist_candidate
+Args:
+  - String:          'hoisting '
+  - Inst:            load
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        hoist_candidate
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        hoist_candidate
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...
