@@ -1,0 +1,8 @@
+# Baseline MLIR GPU → NVVM → LLVM lowering pipeline
+
+gpu-kernel-outlining
+gpu-lower-to-nvvm-pipeline
+convert-memref-to-llvm
+convert-func-to-llvm
+convert-scf-to-cf
+reconcile-unrealized-casts

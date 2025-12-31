@@ -1,0 +1,25 @@
+cat << 'EOF' > .gitignore
+# Build artifacts
+*.o
+*.so
+*.a
+*.out
+
+# Generated IR
+*.ll
+*.bc
+*.ptx
+
+# Temporary files
+*.tmp
+*.log
+
+# Outputs directory contents (keep structure, not data)
+outputs/*
+
+# macOS junk
+.DS_Store
+
+# Python
+__pycache__/
+EOF
