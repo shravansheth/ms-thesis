@@ -1,0 +1,10 @@
+digraph "CFG for 'subview_hoist_static' function" {
+	label="CFG for 'subview_hoist_static' function";
+
+	Node0x102eea4d0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{0:\l|  %1 = tail call dereferenceable_or_null(4096) ptr @malloc(i64 4096)\l  store float 0.000000e+00, ptr %1, align 4\l  br label %2\l}"];
+	Node0x102eea4d0 -> Node0x102eea6c0;
+	Node0x102eea6c0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{2:\l|  %3 = phi i64 [ 0, %0 ], [ %9, %2 ]\l  %4 = getelementptr float, ptr %1, i64 %3\l  %5 = load float, ptr %4, align 4\l  %6 = fadd float %5, 0.000000e+00\l  %7 = or disjoint i64 %3, 512\l  %8 = getelementptr float, ptr %1, i64 %7\l  store float %6, ptr %8, align 4, !alias.scope !4, !noalias !5\l  %9 = add nuw nsw i64 %3, 1\l  %10 = icmp samesign ult i64 %3, 511\l  br i1 %10, label %2, label %11\l|{<s0>T|<s1>F}}"];
+	Node0x102eea6c0:s0 -> Node0x102eea6c0;
+	Node0x102eea6c0:s1 -> Node0x102eeab80;
+	Node0x102eeab80 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{11:\l|  tail call void @free(ptr nonnull %1)\l  ret void\l}"];
+}

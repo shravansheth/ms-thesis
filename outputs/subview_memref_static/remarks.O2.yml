@@ -1,0 +1,83 @@
+--- !Missed
+Pass:            inline
+Name:            NoDefinition
+Function:        subview_hoist_static
+Args:
+  - Callee:          malloc
+  - String:          ' will not be inlined into '
+  - Caller:          subview_hoist_static
+  - String:          ' because its definition is unavailable'
+...
+--- !Missed
+Pass:            inline
+Name:            NoDefinition
+Function:        subview_hoist_static
+Args:
+  - Callee:          free
+  - String:          ' will not be inlined into '
+  - Caller:          subview_hoist_static
+  - String:          ' because its definition is unavailable'
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        subview_hoist_static
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        subview_hoist_static
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            gvn
+Name:            LoadClobbered
+Function:        subview_hoist_static
+Args:
+  - String:          'load of type '
+  - Type:            float
+  - String:          ' not eliminated'
+  - String:          ' in favor of '
+  - OtherAccess:     store
+  - String:          ' because it is clobbered by '
+  - ClobberedBy:     store
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        subview_hoist_static
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        subview_hoist_static
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        subview_hoist_static
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...
+--- !Missed
+Pass:            slp-vectorizer
+Name:            NotPossible
+Function:        subview_hoist_static
+Args:
+  - String:          'Cannot SLP vectorize list: vectorization was impossible'
+  - String:          ' with available vectorization factors'
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        subview_hoist_static
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
