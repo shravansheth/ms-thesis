@@ -1,17 +1,12 @@
-cat << 'EOF' > .gitignore
-# Build artifacts
 *.o
 *.so
 *.a
 *.out
 
-# Temporary files
 *.tmp
 *.log
 
-# macOS junk
 .DS_Store
 
-# Python
-__pycache__/
-EOF
+.claude/
+prev_cases/

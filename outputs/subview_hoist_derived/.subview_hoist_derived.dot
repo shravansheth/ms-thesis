@@ -1,0 +1,15 @@
+digraph "CFG for 'subview_hoist_derived' function" {
+	label="CFG for 'subview_hoist_derived' function";
+
+	Node0x10a670bf0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{0:\l|  %1 = tail call dereferenceable_or_null(8192) ptr @malloc(i64 8192)\l  br label %3\l}"];
+	Node0x10a670bf0 -> Node0x10a670d10;
+	Node0x10a670dd0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.preheader:\l|  %2 = getelementptr inbounds nuw i8, ptr %1, i64 2048\l  %.pre = load float, ptr %2, align 4\l  br label %10\l}"];
+	Node0x10a670dd0 -> Node0x10a671040;
+	Node0x10a670d10 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{3:\l|  %4 = phi i64 [ 0, %0 ], [ %8, %3 ]\l  %5 = getelementptr inbounds nuw float, ptr %1, i64 %4\l  %6 = getelementptr inbounds nuw i8, ptr %5, i64 2048\l  store float 2.000000e+00, ptr %6, align 4\l  %7 = getelementptr inbounds nuw i8, ptr %5, i64 3072\l  store float 0.000000e+00, ptr %7, align 4\l  %8 = add nuw nsw i64 %4, 1\l  %9 = icmp samesign ult i64 %4, 255\l  br i1 %9, label %3, label %.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x10a670d10:s0 -> Node0x10a670d10;
+	Node0x10a670d10:s1 -> Node0x10a670dd0;
+	Node0x10a671040 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{10:\l|  %11 = phi i64 [ 0, %.preheader ], [ %17, %10 ]\l  %12 = getelementptr inbounds nuw float, ptr %1, i64 %11\l  %13 = getelementptr inbounds nuw i8, ptr %12, i64 2048\l  %14 = load float, ptr %13, align 4\l  %15 = fadd float %.pre, %14\l  %16 = getelementptr inbounds nuw i8, ptr %12, i64 3072\l  store float %15, ptr %16, align 4\l  %17 = add nuw nsw i64 %11, 1\l  %18 = icmp samesign ult i64 %11, 255\l  br i1 %18, label %10, label %19\l|{<s0>T|<s1>F}}"];
+	Node0x10a671040:s0 -> Node0x10a671040;
+	Node0x10a671040:s1 -> Node0x10a671b50;
+	Node0x10a671b50 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{19:\l|  tail call void @free(ptr nonnull %1)\l  ret void\l}"];
+}

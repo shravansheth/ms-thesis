@@ -1,2 +1,4 @@
-LLVM version: 20.1.3
+LLVM (http://llvm.org/):
+  LLVM version 22.0.0git
+  Optimized build.
 LLVM commit: 9af00e62ecc33960ada5366bffc369a647699fe9

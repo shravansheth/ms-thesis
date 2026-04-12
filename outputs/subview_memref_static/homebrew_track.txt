@@ -1,0 +1,248 @@
+
+Running pass: Annotation2MetadataPass on [module]
+Running pass: ForceFunctionAttrsPass on [module]
+Running pass: InferFunctionAttrsPass on [module]
+Running analysis: InnerAnalysisManagerProxy<FunctionAnalysisManager, Module> on [module]
+Running analysis: TargetLibraryAnalysis on free
+Running analysis: TargetLibraryAnalysis on malloc
+Invalidating analysis: InnerAnalysisManagerProxy<FunctionAnalysisManager, Module> on [module]
+Running pass: CoroEarlyPass on [module]
+Running pass: ModuleToFunctionPassAdaptor on [module]
+Running analysis: InnerAnalysisManagerProxy<FunctionAnalysisManager, Module> on [module]
+Running pass: PassManager<Function> on subview_hoist_static (29 instructions)
+Running pass: EntryExitInstrumenterPass on subview_hoist_static (29 instructions)
+Running pass: LowerExpectIntrinsicPass on subview_hoist_static (29 instructions)
+Running pass: SimplifyCFGPass on subview_hoist_static (29 instructions)
+Running analysis: TargetIRAnalysis on subview_hoist_static
+Running analysis: AssumptionAnalysis on subview_hoist_static
+Running pass: SROAPass on subview_hoist_static (29 instructions)
+Running analysis: DominatorTreeAnalysis on subview_hoist_static
+Running pass: EarlyCSEPass on subview_hoist_static (29 instructions)
+Running analysis: TargetLibraryAnalysis on subview_hoist_static
+Invalidating analysis: DominatorTreeAnalysis on subview_hoist_static
+Running pass: OpenMPOptPass on [module]
+Running pass: IPSCCPPass on [module]
+Running analysis: DominatorTreeAnalysis on subview_hoist_static
+Running pass: CalledValuePropagationPass on [module]
+Running pass: GlobalOptPass on [module]
+Running analysis: TargetLibraryAnalysis on free
+Running pass: ModuleToFunctionPassAdaptor on [module]
+Running pass: PassManager<Function> on subview_hoist_static (22 instructions)
+Running pass: PromotePass on subview_hoist_static (22 instructions)
+Running pass: InstCombinePass on subview_hoist_static (22 instructions)
+Running analysis: LastRunTrackingAnalysis on subview_hoist_static
+Running analysis: OptimizationRemarkEmitterAnalysis on subview_hoist_static
+Running analysis: AAManager on subview_hoist_static
+Running analysis: BasicAA on subview_hoist_static
+Running analysis: ScopedNoAliasAA on subview_hoist_static
+Running analysis: TypeBasedAA on subview_hoist_static
+Running analysis: OuterAnalysisManagerProxy<ModuleAnalysisManager, Function> on subview_hoist_static
+Running pass: SimplifyCFGPass on subview_hoist_static (17 instructions)
+Invalidating analysis: DominatorTreeAnalysis on subview_hoist_static
+Invalidating analysis: LastRunTrackingAnalysis on subview_hoist_static
+Invalidating analysis: BasicAA on subview_hoist_static
+Invalidating analysis: AAManager on subview_hoist_static
+Running pass: AlwaysInlinerPass on [module]
+Running analysis: ProfileSummaryAnalysis on [module]
+Running pass: ModuleInlinerWrapperPass on [module]
+Running analysis: InlineAdvisorAnalysis on [module]
+Running pass: RequireAnalysisPass<llvm::GlobalsAA, llvm::Module, llvm::AnalysisManager<Module>> on [module]
+Running analysis: GlobalsAA on [module]
+Running analysis: CallGraphAnalysis on [module]
+Running pass: ModuleToFunctionPassAdaptor on [module]
+Running pass: InvalidateAnalysisPass<llvm::AAManager> on subview_hoist_static (17 instructions)
+Running pass: RequireAnalysisPass<llvm::ProfileSummaryAnalysis, llvm::Module, llvm::AnalysisManager<Module>> on [module]
+Running pass: ModuleToPostOrderCGSCCPassAdaptor on [module]
+Running analysis: InnerAnalysisManagerProxy<CGSCCAnalysisManager, Module> on [module]
+Running analysis: LazyCallGraphAnalysis on [module]
+Running analysis: FunctionAnalysisManagerCGSCCProxy on (subview_hoist_static)
+Running analysis: OuterAnalysisManagerProxy<ModuleAnalysisManager, LazyCallGraph::SCC, LazyCallGraph &> on (subview_hoist_static)
+Running pass: DevirtSCCRepeatedPass on (subview_hoist_static) (1 node)
+Running pass: PassManager<LazyCallGraph::SCC, CGSCCAnalysisManager, LazyCallGraph &, CGSCCUpdateResult &> on (subview_hoist_static) (1 node)
+Running pass: InlinerPass on (subview_hoist_static) (1 node)
+Running pass: PostOrderFunctionAttrsPass on (subview_hoist_static) (1 node)
+Running pass: OpenMPOptCGSCCPass on (subview_hoist_static) (1 node)
+Running pass: CGSCCToFunctionPassAdaptor on (subview_hoist_static) (1 node)
+Running pass: PassManager<Function> on subview_hoist_static (17 instructions)
+Running pass: SROAPass on subview_hoist_static (17 instructions)
+Running analysis: DominatorTreeAnalysis on subview_hoist_static
+Running pass: EarlyCSEPass on subview_hoist_static (17 instructions)
+Running analysis: MemorySSAAnalysis on subview_hoist_static
+Running analysis: AAManager on subview_hoist_static
+Running analysis: BasicAA on subview_hoist_static
+Running pass: SpeculativeExecutionPass on subview_hoist_static (17 instructions)
+Running pass: JumpThreadingPass on subview_hoist_static (17 instructions)
+Running analysis: LazyValueAnalysis on subview_hoist_static
+Running pass: CorrelatedValuePropagationPass on subview_hoist_static (17 instructions)
+Invalidating analysis: MemorySSAAnalysis on subview_hoist_static
+Invalidating analysis: LazyValueAnalysis on subview_hoist_static
+Running pass: SimplifyCFGPass on subview_hoist_static (17 instructions)
+Running pass: InstCombinePass on subview_hoist_static (17 instructions)
+Running analysis: LastRunTrackingAnalysis on subview_hoist_static
+Running pass: AggressiveInstCombinePass on subview_hoist_static (17 instructions)
+Running pass: LibCallsShrinkWrapPass on subview_hoist_static (17 instructions)
+Running pass: TailCallElimPass on subview_hoist_static (17 instructions)
+Invalidating analysis: LastRunTrackingAnalysis on subview_hoist_static
+Running pass: SimplifyCFGPass on subview_hoist_static (17 instructions)
+Running pass: ReassociatePass on subview_hoist_static (17 instructions)
+Running pass: ConstraintEliminationPass on subview_hoist_static (17 instructions)
+Running analysis: LoopAnalysis on subview_hoist_static
+Running analysis: ScalarEvolutionAnalysis on subview_hoist_static
+Running pass: FunctionToLoopPassAdaptor on subview_hoist_static (17 instructions)
+Running pass: PassManager<Function> on subview_hoist_static (17 instructions)
+Running pass: LoopSimplifyPass on subview_hoist_static (17 instructions)
+Running pass: LCSSAPass on subview_hoist_static (17 instructions)
+Running analysis: MemorySSAAnalysis on subview_hoist_static
+Running analysis: InnerAnalysisManagerProxy<LoopAnalysisManager, Function> on subview_hoist_static
+Running pass: PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopInstSimplifyPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopSimplifyCFGPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LICMPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopRotatePass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LICMPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: SimpleLoopUnswitchPass on loop %<unnamed loop> in function subview_hoist_static
+Running analysis: OuterAnalysisManagerProxy<FunctionAnalysisManager, Loop, LoopStandardAnalysisResults &> on loop %<unnamed loop> in function subview_hoist_static
+Running pass: SimplifyCFGPass on subview_hoist_static (16 instructions)
+Running pass: InstCombinePass on subview_hoist_static (16 instructions)
+Running analysis: LastRunTrackingAnalysis on subview_hoist_static
+Clearing all analysis results for: <possibly invalidated loop>
+Invalidating analysis: ScalarEvolutionAnalysis on subview_hoist_static
+Invalidating analysis: MemorySSAAnalysis on subview_hoist_static
+Invalidating analysis: InnerAnalysisManagerProxy<LoopAnalysisManager, Function> on subview_hoist_static
+Running pass: FunctionToLoopPassAdaptor on subview_hoist_static (16 instructions)
+Running pass: PassManager<Function> on subview_hoist_static (16 instructions)
+Running pass: LoopSimplifyPass on subview_hoist_static (16 instructions)
+Running pass: LCSSAPass on subview_hoist_static (16 instructions)
+Running analysis: ScalarEvolutionAnalysis on subview_hoist_static
+Running analysis: InnerAnalysisManagerProxy<LoopAnalysisManager, Function> on subview_hoist_static
+Running pass: PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopIdiomRecognizePass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: IndVarSimplifyPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: ExtraLoopPassManager<llvm::ShouldRunExtraSimpleLoopUnswitch> on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopDeletionPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopFullUnrollPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: SROAPass on subview_hoist_static (16 instructions)
+Running pass: VectorCombinePass on subview_hoist_static (16 instructions)
+Running pass: MergedLoadStoreMotionPass on subview_hoist_static (16 instructions)
+Running pass: GVNPass on subview_hoist_static (16 instructions)
+Running analysis: MemoryDependenceAnalysis on subview_hoist_static
+Running pass: SCCPPass on subview_hoist_static (16 instructions)
+Running pass: BDCEPass on subview_hoist_static (16 instructions)
+Running analysis: DemandedBitsAnalysis on subview_hoist_static
+Running pass: InstCombinePass on subview_hoist_static (16 instructions)
+Running pass: JumpThreadingPass on subview_hoist_static (16 instructions)
+Running analysis: LazyValueAnalysis on subview_hoist_static
+Running pass: CorrelatedValuePropagationPass on subview_hoist_static (16 instructions)
+Invalidating analysis: LazyValueAnalysis on subview_hoist_static
+Running pass: ADCEPass on subview_hoist_static (16 instructions)
+Running analysis: PostDominatorTreeAnalysis on subview_hoist_static
+Running pass: MemCpyOptPass on subview_hoist_static (16 instructions)
+Running analysis: MemorySSAAnalysis on subview_hoist_static
+Running pass: DSEPass on subview_hoist_static (16 instructions)
+Running pass: MoveAutoInitPass on subview_hoist_static (16 instructions)
+Running pass: FunctionToLoopPassAdaptor on subview_hoist_static (16 instructions)
+Running pass: PassManager<Function> on subview_hoist_static (16 instructions)
+Running pass: LoopSimplifyPass on subview_hoist_static (16 instructions)
+Running pass: LCSSAPass on subview_hoist_static (16 instructions)
+Running pass: LICMPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: CoroElidePass on subview_hoist_static (16 instructions)
+Running pass: SimplifyCFGPass on subview_hoist_static (16 instructions)
+Running pass: InstCombinePass on subview_hoist_static (16 instructions)
+Clearing all analysis results for: <possibly invalidated loop>
+Invalidating analysis: DominatorTreeAnalysis on subview_hoist_static
+Invalidating analysis: BasicAA on subview_hoist_static
+Invalidating analysis: AAManager on subview_hoist_static
+Invalidating analysis: LoopAnalysis on subview_hoist_static
+Invalidating analysis: LastRunTrackingAnalysis on subview_hoist_static
+Invalidating analysis: ScalarEvolutionAnalysis on subview_hoist_static
+Invalidating analysis: InnerAnalysisManagerProxy<LoopAnalysisManager, Function> on subview_hoist_static
+Invalidating analysis: MemoryDependenceAnalysis on subview_hoist_static
+Invalidating analysis: DemandedBitsAnalysis on subview_hoist_static
+Invalidating analysis: PostDominatorTreeAnalysis on subview_hoist_static
+Invalidating analysis: MemorySSAAnalysis on subview_hoist_static
+Running pass: PostOrderFunctionAttrsPass on (subview_hoist_static) (1 node)
+Running analysis: AAManager on subview_hoist_static
+Running analysis: BasicAA on subview_hoist_static
+Running analysis: DominatorTreeAnalysis on subview_hoist_static
+Running pass: CGSCCToFunctionPassAdaptor on (subview_hoist_static) (1 node)
+Running pass: RequireAnalysisPass<llvm::ShouldNotRunFunctionPassesAnalysis, llvm::Function, llvm::AnalysisManager<Function>> on subview_hoist_static (16 instructions)
+Running analysis: ShouldNotRunFunctionPassesAnalysis on subview_hoist_static
+Running pass: CoroSplitPass on (subview_hoist_static) (1 node)
+Running pass: CoroAnnotationElidePass on (subview_hoist_static) (1 node)
+Invalidating analysis: CallGraphAnalysis on [module]
+Running pass: ModuleToFunctionPassAdaptor on [module]
+Running pass: InvalidateAnalysisPass<llvm::ShouldNotRunFunctionPassesAnalysis> on subview_hoist_static (16 instructions)
+Invalidating analysis: ShouldNotRunFunctionPassesAnalysis on subview_hoist_static
+Invalidating analysis: InlineAdvisorAnalysis on [module]
+Running pass: DeadArgumentEliminationPass on [module]
+Running pass: CoroCleanupPass on [module]
+Running pass: GlobalOptPass on [module]
+Running pass: GlobalDCEPass on [module]
+Running pass: EliminateAvailableExternallyPass on [module]
+Running pass: ReversePostOrderFunctionAttrsPass on [module]
+Running pass: RecomputeGlobalsAAPass on [module]
+Running analysis: CallGraphAnalysis on [module]
+Running pass: ModuleToFunctionPassAdaptor on [module]
+Running pass: PassManager<Function> on subview_hoist_static (16 instructions)
+Running pass: Float2IntPass on subview_hoist_static (16 instructions)
+Running pass: LowerConstantIntrinsicsPass on subview_hoist_static (16 instructions)
+Running pass: FunctionToLoopPassAdaptor on subview_hoist_static (16 instructions)
+Running pass: PassManager<Function> on subview_hoist_static (16 instructions)
+Running pass: LoopSimplifyPass on subview_hoist_static (16 instructions)
+Running analysis: LoopAnalysis on subview_hoist_static
+Running pass: LCSSAPass on subview_hoist_static (16 instructions)
+Running analysis: ScalarEvolutionAnalysis on subview_hoist_static
+Running analysis: InnerAnalysisManagerProxy<LoopAnalysisManager, Function> on subview_hoist_static
+Running pass: PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopRotatePass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopDeletionPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: LoopDistributePass on subview_hoist_static (16 instructions)
+Running analysis: LoopAccessAnalysis on subview_hoist_static
+Running pass: InjectTLIMappings on subview_hoist_static (16 instructions)
+Running pass: LoopVectorizePass on subview_hoist_static (16 instructions)
+Running analysis: DemandedBitsAnalysis on subview_hoist_static
+Running pass: InferAlignmentPass on subview_hoist_static (16 instructions)
+Running pass: LoopLoadEliminationPass on subview_hoist_static (16 instructions)
+Running pass: InstCombinePass on subview_hoist_static (16 instructions)
+Running analysis: LastRunTrackingAnalysis on subview_hoist_static
+Running pass: SimplifyCFGPass on subview_hoist_static (16 instructions)
+Running pass: SLPVectorizerPass on subview_hoist_static (16 instructions)
+Running pass: VectorCombinePass on subview_hoist_static (16 instructions)
+Running pass: InstCombinePass on subview_hoist_static (16 instructions)
+Running pass: LoopUnrollPass on subview_hoist_static (16 instructions)
+Running pass: WarnMissedTransformationsPass on subview_hoist_static (16 instructions)
+Running pass: SROAPass on subview_hoist_static (16 instructions)
+Running pass: InferAlignmentPass on subview_hoist_static (16 instructions)
+Running pass: InstCombinePass on subview_hoist_static (16 instructions)
+Running pass: FunctionToLoopPassAdaptor on subview_hoist_static (16 instructions)
+Running pass: PassManager<Function> on subview_hoist_static (16 instructions)
+Running pass: LoopSimplifyPass on subview_hoist_static (16 instructions)
+Running pass: LCSSAPass on subview_hoist_static (16 instructions)
+Running analysis: MemorySSAAnalysis on subview_hoist_static
+Running pass: LICMPass on loop %<unnamed loop> in function subview_hoist_static
+Running pass: AlignmentFromAssumptionsPass on subview_hoist_static (16 instructions)
+Running pass: LoopSinkPass on subview_hoist_static (16 instructions)
+Running pass: InstSimplifyPass on subview_hoist_static (16 instructions)
+Running pass: DivRemPairsPass on subview_hoist_static (16 instructions)
+Running pass: TailCallElimPass on subview_hoist_static (16 instructions)
+Running pass: SimplifyCFGPass on subview_hoist_static (16 instructions)
+Clearing all analysis results for: <possibly invalidated loop>
+Invalidating analysis: DominatorTreeAnalysis on subview_hoist_static
+Invalidating analysis: BasicAA on subview_hoist_static
+Invalidating analysis: AAManager on subview_hoist_static
+Invalidating analysis: LoopAnalysis on subview_hoist_static
+Invalidating analysis: ScalarEvolutionAnalysis on subview_hoist_static
+Invalidating analysis: InnerAnalysisManagerProxy<LoopAnalysisManager, Function> on subview_hoist_static
+Invalidating analysis: LoopAccessAnalysis on subview_hoist_static
+Invalidating analysis: DemandedBitsAnalysis on subview_hoist_static
+Invalidating analysis: LastRunTrackingAnalysis on subview_hoist_static
+Invalidating analysis: MemorySSAAnalysis on subview_hoist_static
+Running pass: GlobalDCEPass on [module]
+Running pass: ConstantMergePass on [module]
+Running pass: CGProfilePass on [module]
+Running pass: RelLookupTableConverterPass on [module]
+Running pass: ModuleToFunctionPassAdaptor on [module]
+Running pass: AnnotationRemarksPass on subview_hoist_static (16 instructions)
+Running pass: VerifierPass on [module]
+Running analysis: VerifierAnalysis on [module]
+

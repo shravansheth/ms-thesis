@@ -1,0 +1,10 @@
+digraph "CFG for 'case_stride_even_odd' function" {
+	label="CFG for 'case_stride_even_odd' function";
+
+	Node0x1089e8c10 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{0:\l|  %1 = tail call dereferenceable_or_null(8192) ptr @malloc(i64 8192)\l  %2 = getelementptr inbounds nuw i8, ptr %1, i64 2048\l  store float 2.000000e+00, ptr %2, align 4\l  br label %3\l}"];
+	Node0x1089e8c10 -> Node0x1089e8d90;
+	Node0x1089e8d90 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{3:\l|  %4 = phi i64 [ 0, %0 ], [ %10, %3 ]\l  %.idx = shl nuw nsw i64 %4, 3\l  %5 = getelementptr inbounds nuw i8, ptr %1, i64 %.idx\l  %6 = getelementptr inbounds nuw i8, ptr %5, i64 2048\l  %7 = load float, ptr %6, align 4\l  %8 = fadd float %7, 2.000000e+00\l  %9 = getelementptr inbounds nuw i8, ptr %5, i64 2052\l  store float %8, ptr %9, align 4\l  %10 = add nuw nsw i64 %4, 1\l  %11 = icmp samesign ult i64 %4, 255\l  br i1 %11, label %3, label %12\l|{<s0>T|<s1>F}}"];
+	Node0x1089e8d90:s0 -> Node0x1089e8d90;
+	Node0x1089e8d90:s1 -> Node0x1089e9170;
+	Node0x1089e9170 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{12:\l|  tail call void @free(ptr nonnull %1)\l  ret void\l}"];
+}

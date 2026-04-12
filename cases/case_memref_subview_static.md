@@ -1,5 +1,5 @@
-# Case 2 — Disjoint memref.subview halves reduced to pointer arithmetic; alias uncertainty blocks simplification
-
+# Case — Disjoint memref.subview halves reduced to pointer arithmetic; alias uncertainty blocks simplification
+# INVALIDATED: Invalidated due to version mismatch. Issue works in LLVM 22.0.0
 ## Kernel
 `kernels/mlir/subview_hoist_static.mlir`
 

@@ -1,0 +1,10 @@
+digraph "CFG for 'hoist_candidate' function" {
+	label="CFG for 'hoist_candidate' function";
+
+	Node0x10a8599d0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{10:\l|  br label %11\l}"];
+	Node0x10a8599d0 -> Node0x10a85c3b0;
+	Node0x10a85c3b0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{11:\l|  %12 = phi i64 [ 0, %10 ], [ %17, %11 ]\l  %13 = load float, ptr %6, align 4\l  %14 = getelementptr inbounds nuw float, ptr %1, i64 %12\l  %15 = load float, ptr %14, align 4\l  %16 = fadd float %13, %15\l  store float %16, ptr %14, align 4\l  %17 = add nuw nsw i64 %12, 1\l  %18 = icmp samesign ult i64 %12, 1023\l  br i1 %18, label %11, label %19\l|{<s0>T|<s1>F}}"];
+	Node0x10a85c3b0:s0 -> Node0x10a85c3b0;
+	Node0x10a85c3b0:s1 -> Node0x10a85c600;
+	Node0x10a85c600 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{19:\l|  ret void\l}"];
+}

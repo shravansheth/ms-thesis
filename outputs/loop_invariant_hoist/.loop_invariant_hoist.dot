@@ -1,0 +1,16 @@
+digraph "CFG for 'loop_invariant_hoist' function" {
+	label="CFG for 'loop_invariant_hoist' function";
+
+	Node0x10cdb9250 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{16:\l|  %17 = icmp sgt i64 %15, 0\l  br i1 %17, label %.lr.ph.preheader, label %._crit_edge5\l|{<s0>T|<s1>F}}"];
+	Node0x10cdb9250:s0 -> Node0x10cdb8e10;
+	Node0x10cdb9250:s1 -> Node0x10cdb8f90;
+	Node0x10cdb8e10 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph.preheader:\l|  %18 = phi i64 [ %29, %._crit_edge ], [ 0, %16 ]\l  %19 = getelementptr inbounds nuw float, ptr %1, i64 %18\l  %20 = load float, ptr %19, align 4\l  br label %.lr.ph\l}"];
+	Node0x10cdb8e10 -> Node0x10cdb9840;
+	Node0x10cdb9840 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{.lr.ph:\l|  %21 = phi i64 [ %27, %.lr.ph ], [ 0, %.lr.ph.preheader ]\l  %22 = getelementptr inbounds nuw float, ptr %6, i64 %21\l  %23 = load float, ptr %22, align 4\l  %24 = fmul float %20, %23\l  %25 = fadd float %24, 0.000000e+00\l  %26 = getelementptr inbounds nuw float, ptr %11, i64 %21\l  store float %25, ptr %26, align 4\l  %27 = add nuw nsw i64 %21, 1\l  %28 = icmp slt i64 %27, %15\l  br i1 %28, label %.lr.ph, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10cdb9840:s0 -> Node0x10cdb9840;
+	Node0x10cdb9840:s1 -> Node0x10cdb90f0;
+	Node0x10cdb90f0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{._crit_edge:\l|  %29 = add nuw nsw i64 %18, 1\l  %30 = icmp slt i64 %29, %15\l  br i1 %30, label %.lr.ph.preheader, label %._crit_edge5\l|{<s0>T|<s1>F}}"];
+	Node0x10cdb90f0:s0 -> Node0x10cdb8e10;
+	Node0x10cdb90f0:s1 -> Node0x10cdb8f90;
+	Node0x10cdb8f90 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{._crit_edge5:\l|  ret void\l}"];
+}

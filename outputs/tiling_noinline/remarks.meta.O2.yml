@@ -1,0 +1,52 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        tile_stencil
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        tile_stencil
+Args:
+  - String:          'hoisting '
+  - Inst:            load
+...
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        tile_stencil
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Missed
+Pass:            inline
+Name:            NeverInline
+Function:        tiling_caller
+Args:
+  - String:          ''''
+  - Callee:          tile_stencil
+  - String:          ''' not inlined into '''
+  - Caller:          tiling_caller
+  - String:          ''' because it should never be inlined '
+  - String:          '(cost=never)'
+  - String:          ': '
+  - Reason:          noinline call site attribute
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        tile_stencil
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        tile_stencil
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...

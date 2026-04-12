@@ -6,6 +6,13 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
+LLVM_BUILD="${LLVM_BUILD:-/Users/shravansheth/ShravsSSD/llvm-project/build}"
+
+MLIR_OPT="$LLVM_BUILD/bin/mlir-opt"
+
+MLIR_TRANSLATE="$LLVM_BUILD/bin/mlir-translate"
+OPT="$LLVM_BUILD/bin/opt"
+
 INPUT=$1
 PREFIX=$2
 
@@ -15,10 +22,11 @@ BASENAME="$(basename "$PREFIX")"
 mkdir -p "$OUTDIR"
 
 # ---- MLIR → LLVM dialect ----
-mlir-opt "$INPUT" \
+"$MLIR_OPT" "$INPUT" \
   -convert-scf-to-cf \
   -memref-expand \
   -fold-memref-alias-ops \
+  -expand-strided-metadata \
   -lower-affine \
   -convert-arith-to-llvm \
   -convert-index-to-llvm \
@@ -30,14 +38,14 @@ mlir-opt "$INPUT" \
   > "${PREFIX}.llvm_dialect.mlir"
 
 # ---- LLVM dialect → LLVM IR ----
-mlir-translate --mlir-to-llvmir \
+"$MLIR_TRANSLATE" --mlir-to-llvmir \
   "${PREFIX}.llvm_dialect.mlir" \
   > "${PREFIX}.ll"
 
 # ---- Generate CFG DOT files ----
 cd "$OUTDIR"
 
-opt -passes=dot-cfg -disable-output "${BASENAME}.ll"
+"$OPT" -passes=dot-cfg -disable-output "${BASENAME}.ll"
 
 for dotfile in *.dot .*.dot; do
   [ -f "$dotfile" ] || continue

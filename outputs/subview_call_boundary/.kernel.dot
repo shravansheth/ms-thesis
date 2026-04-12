@@ -1,0 +1,10 @@
+digraph "CFG for 'kernel' function" {
+	label="CFG for 'kernel' function";
+
+	Node0x10158db70 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{10:\l|  %11 = getelementptr i8, ptr %6, i64 2048\l  br label %12\l}"];
+	Node0x10158db70 -> Node0x10158dbf0;
+	Node0x10158dbf0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{12:\l|  %13 = phi i64 [ 0, %10 ], [ %19, %12 ]\l  %14 = load float, ptr %1, align 4\l  %15 = getelementptr float, ptr %1, i64 %13\l  %16 = load float, ptr %15, align 4\l  %17 = fadd float %14, %16\l  %18 = getelementptr float, ptr %11, i64 %13\l  store float %17, ptr %18, align 4\l  %19 = add nuw nsw i64 %13, 1\l  %20 = icmp samesign ult i64 %13, 511\l  br i1 %20, label %12, label %21\l|{<s0>T|<s1>F}}"];
+	Node0x10158dbf0:s0 -> Node0x10158dbf0;
+	Node0x10158dbf0:s1 -> Node0x10158e3b0;
+	Node0x10158e3b0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{21:\l|  ret void\l}"];
+}

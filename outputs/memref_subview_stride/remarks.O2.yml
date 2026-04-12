@@ -1,0 +1,34 @@
+--- !Missed
+Pass:            inline
+Name:            NoDefinition
+Function:        case_stride_even_odd
+Args:
+  - Callee:          malloc
+  - String:          ' will not be inlined into '
+  - Caller:          case_stride_even_odd
+  - String:          ' because its definition is unavailable'
+...
+--- !Missed
+Pass:            inline
+Name:            NoDefinition
+Function:        case_stride_even_odd
+Args:
+  - Callee:          free
+  - String:          ' will not be inlined into '
+  - Caller:          case_stride_even_odd
+  - String:          ' because its definition is unavailable'
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        case_stride_even_odd
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        case_stride_even_odd
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...

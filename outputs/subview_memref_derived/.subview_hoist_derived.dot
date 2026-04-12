@@ -1,0 +1,15 @@
+digraph "CFG for 'subview_hoist_derived' function" {
+	label="CFG for 'subview_hoist_derived' function";
+
+	Node0x10178f5f0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{0:\l|  %1 = tail call dereferenceable_or_null(8192) ptr @malloc(i64 8192)\l  br label %3\l}"];
+	Node0x10178f5f0 -> Node0x10178f6e0;
+	Node0x10178f7a0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.preheader:\l|  %2 = getelementptr inbounds nuw i8, ptr %1, i64 2048\l  %.pre = load float, ptr %2, align 4\l  br label %11\l}"];
+	Node0x10178f7a0 -> Node0x10178fa10;
+	Node0x10178f6e0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{3:\l|  %4 = phi i64 [ 0, %0 ], [ %9, %3 ]\l  %5 = or disjoint i64 %4, 512\l  %6 = getelementptr inbounds nuw float, ptr %1, i64 %5\l  store float 2.000000e+00, ptr %6, align 4\l  %7 = or disjoint i64 %4, 768\l  %8 = getelementptr inbounds nuw float, ptr %1, i64 %7\l  store float 0.000000e+00, ptr %8, align 4\l  %9 = add nuw nsw i64 %4, 1\l  %10 = icmp samesign ult i64 %4, 255\l  br i1 %10, label %3, label %.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x10178f6e0:s0 -> Node0x10178f6e0;
+	Node0x10178f6e0:s1 -> Node0x10178f7a0;
+	Node0x10178fa10 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{11:\l|  %12 = phi i64 [ 0, %.preheader ], [ %19, %11 ]\l  %13 = or disjoint i64 %12, 512\l  %14 = getelementptr inbounds nuw float, ptr %1, i64 %13\l  %15 = load float, ptr %14, align 4\l  %16 = fadd float %.pre, %15\l  %17 = or disjoint i64 %12, 768\l  %18 = getelementptr inbounds nuw float, ptr %1, i64 %17\l  store float %16, ptr %18, align 4\l  %19 = add nuw nsw i64 %12, 1\l  %20 = icmp samesign ult i64 %12, 255\l  br i1 %20, label %11, label %21\l|{<s0>T|<s1>F}}"];
+	Node0x10178fa10:s0 -> Node0x10178fa10;
+	Node0x10178fa10:s1 -> Node0x1017900f0;
+	Node0x1017900f0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{21:\l|  tail call void @free(ptr nonnull %1)\l  ret void\l}"];
+}

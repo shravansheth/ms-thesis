@@ -1,0 +1,22 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        loop_invariant_hoist
+Args:
+  - String:          'hoisting '
+  - Inst:            icmp
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        loop_invariant_hoist
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        loop_invariant_hoist
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...

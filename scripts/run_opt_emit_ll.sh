@@ -10,11 +10,16 @@ INPUT=$1
 OUTPUT=$2
 REMARKS=$3
 
+LLVM_BUILD="${LLVM_BUILD:-/Users/shravansheth/ShravsSSD/llvm-project/build}"
+
+OPT="$LLVM_BUILD/bin/opt"
+
+
 OUTDIR="$(dirname "$OUTPUT")"
 BASENAME="$(basename "$OUTPUT" .ll)"
 
 # ---- Run O2 pipeline ----
-opt "$INPUT" \
+"$OPT" "$INPUT" \
   -passes="default<O2>" \
   -S \
   -o "$OUTPUT" \
@@ -26,7 +31,7 @@ opt "$INPUT" \
 # ---- CFG generation----
 cd "$OUTDIR"
 
-opt -passes=dot-cfg -disable-output "$(basename "$OUTPUT")"
+"$OPT" -passes=dot-cfg -disable-output "$(basename "$OUTPUT")"
 
 for dotfile in *.dot .*.dot; do
   [ -f "$dotfile" ] || continue

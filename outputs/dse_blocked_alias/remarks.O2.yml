@@ -1,0 +1,25 @@
+--- !Missed
+Pass:            gvn
+Name:            LoadClobbered
+Function:        dse_blocked_alias
+Args:
+  - String:          'load of type '
+  - Type:            float
+  - String:          ' not eliminated'
+  - String:          ' because it is clobbered by '
+  - ClobberedBy:     store
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        dse_blocked_alias
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        dse_blocked_alias
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...

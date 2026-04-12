@@ -1,0 +1,5 @@
+digraph "CFG for 'tiling_caller' function" {
+	label="CFG for 'tiling_caller' function";
+
+	Node0x10c76be50 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{7:\l|  %8 = mul i64 %6, %5\l  %9 = add i64 %8, %6\l  tail call void @tile_stencil(ptr poison, ptr %1, i64 %8, i64 poison, i64\l... poison, ptr poison, ptr %1, i64 %9, i64 poison, i64 poison, i64 %6) #1\l  ret void\l}"];
+}

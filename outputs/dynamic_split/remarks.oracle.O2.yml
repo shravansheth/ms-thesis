@@ -1,0 +1,35 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        dynamic_split
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Missed
+Pass:            gvn
+Name:            LoadClobbered
+Function:        dynamic_split
+Args:
+  - String:          'load of type '
+  - Type:            float
+  - String:          ' not eliminated'
+  - String:          ' in favor of '
+  - OtherAccess:     store
+  - String:          ' because it is clobbered by '
+  - ClobberedBy:     store
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        dynamic_split
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        dynamic_split
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...

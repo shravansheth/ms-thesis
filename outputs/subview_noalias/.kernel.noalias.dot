@@ -1,0 +1,10 @@
+digraph "CFG for 'kernel.noalias' function" {
+	label="CFG for 'kernel.noalias' function";
+
+	Node0x10c4d3230 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{10:\l|  call void @llvm.assume(i1 true) [ \"separate_storage\"(ptr %1, ptr %6) ]\l  %11 = getelementptr float, ptr %1, i64 %2\l  %12 = load float, ptr %11, align 4\l  %13 = getelementptr float, ptr %6, i64 %7\l  br label %14\l}"];
+	Node0x10c4d3230 -> Node0x10c4d34f0;
+	Node0x10c4d34f0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{14:\l|  %15 = phi i64 [ 0, %10 ], [ %20, %14 ]\l  %16 = getelementptr inbounds nuw float, ptr %11, i64 %15\l  %17 = load float, ptr %16, align 4\l  %18 = fadd float %12, %17\l  %19 = getelementptr inbounds nuw float, ptr %13, i64 %15\l  store float %18, ptr %19, align 4\l  %20 = add nuw nsw i64 %15, 1\l  %21 = icmp samesign ult i64 %15, 511\l  br i1 %21, label %14, label %22\l|{<s0>T|<s1>F}}"];
+	Node0x10c4d34f0:s0 -> Node0x10c4d34f0;
+	Node0x10c4d34f0:s1 -> Node0x10c4d39e0;
+	Node0x10c4d39e0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{22:\l|  ret void\l}"];
+}
