@@ -1,0 +1,22 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        linalg_scale_split
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        linalg_scale_split
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        linalg_scale_split
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...

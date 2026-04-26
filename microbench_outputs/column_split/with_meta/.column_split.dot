@@ -1,0 +1,21 @@
+digraph "CFG for 'column_split' function" {
+	label="CFG for 'column_split' function";
+
+	Node0x10d372b20 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{9:\l|  %10 = sub i64 1024, %8\l  store float 1.000000e+00, ptr %1, align 4\l  %11 = icmp sgt i64 %7, 0\l  br i1 %11, label %.preheader.lr.ph, label %._crit_edge1\l|{<s0>T|<s1>F}}"];
+	Node0x10d372b20:s0 -> Node0x10d376900;
+	Node0x10d372b20:s1 -> Node0x10d376c60;
+	Node0x10d376900 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{.preheader.lr.ph:\l|  %invariant.gep = getelementptr float, ptr %1, i64 %8\l  %12 = icmp sgt i64 %10, 0\l  br label %.preheader\l}"];
+	Node0x10d376900 -> Node0x10d376a30;
+	Node0x10d376a30 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{.preheader:\l|  %13 = phi i64 [ 0, %.preheader.lr.ph ], [ %22, %._crit_edge ]\l  br i1 %12, label %.lr.ph, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10d376a30:s0 -> Node0x10d377110;
+	Node0x10d376a30:s1 -> Node0x10d376fc0;
+	Node0x10d377110 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph:\l|  %.idx = shl nuw nsw i64 %13, 12\l  %gep = getelementptr i8, ptr %invariant.gep, i64 %.idx\l  br label %14\l}"];
+	Node0x10d377110 -> Node0x10d377310;
+	Node0x10d377310 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{14:\l|  %15 = phi i64 [ 0, %.lr.ph ], [ %20, %14 ]\l  %16 = load float, ptr %1, align 4\l  %17 = getelementptr float, ptr %gep, i64 %15\l  %18 = load float, ptr %17, align 4\l  %19 = fadd float %16, %18\l  store float %19, ptr %17, align 4\l  %20 = add nuw nsw i64 %15, 1\l  %21 = icmp slt i64 %20, %10\l  br i1 %21, label %14, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10d377310:s0 -> Node0x10d377310;
+	Node0x10d377310:s1 -> Node0x10d376fc0;
+	Node0x10d376fc0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{._crit_edge:\l|  %22 = add nuw nsw i64 %13, 1\l  %23 = icmp slt i64 %22, %7\l  br i1 %23, label %.preheader, label %._crit_edge1\l|{<s0>T|<s1>F}}"];
+	Node0x10d376fc0:s0 -> Node0x10d376a30;
+	Node0x10d376fc0:s1 -> Node0x10d376c60;
+	Node0x10d376c60 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{._crit_edge1:\l|  ret void\l}"];
+}

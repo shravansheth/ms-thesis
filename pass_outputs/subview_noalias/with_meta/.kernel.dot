@@ -1,0 +1,10 @@
+digraph "CFG for 'kernel' function" {
+	label="CFG for 'kernel' function";
+
+	Node0x10c8562d0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{10:\l|  %11 = getelementptr float, ptr %1, i64 %2\l  %12 = getelementptr float, ptr %6, i64 %7\l  br label %13\l}"];
+	Node0x10c8562d0 -> Node0x10c856460;
+	Node0x10c856460 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{13:\l|  %14 = phi i64 [ 0, %10 ], [ %20, %13 ]\l  %15 = load float, ptr %11, align 4\l  %16 = getelementptr inbounds nuw float, ptr %11, i64 %14\l  %17 = load float, ptr %16, align 4\l  %18 = fadd float %15, %17\l  %19 = getelementptr inbounds nuw float, ptr %12, i64 %14\l  store float %18, ptr %19, align 4\l  %20 = add nuw nsw i64 %14, 1\l  %21 = icmp samesign ult i64 %14, 511\l  br i1 %21, label %13, label %22\l|{<s0>T|<s1>F}}"];
+	Node0x10c856460:s0 -> Node0x10c856460;
+	Node0x10c856460:s1 -> Node0x10c856a00;
+	Node0x10c856a00 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{22:\l|  ret void\l}"];
+}

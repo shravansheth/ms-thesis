@@ -1,0 +1,21 @@
+digraph "CFG for 'linalg_stencil_split' function" {
+	label="CFG for 'linalg_stencil_split' function";
+
+	Node0x10c5828b0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{6:\l|  %7 = sub i64 4096, %5\l  %8 = icmp sgt i64 %7, 0\l  br i1 %8, label %.lr.ph, label %.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x10c5828b0:s0 -> Node0x10c582aa0;
+	Node0x10c5828b0:s1 -> Node0x10c582c20;
+	Node0x10c582aa0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph:\l|  %9 = getelementptr float, ptr %1, i64 %5\l  br label %12\l}"];
+	Node0x10c582aa0 -> Node0x10c582e20;
+	Node0x10c582c20 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{.preheader:\l|  %10 = icmp sgt i64 %5, 0\l  br i1 %10, label %.lr.ph3, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10c582c20:s0 -> Node0x10c582ee0;
+	Node0x10c582c20:s1 -> Node0x10c582f80;
+	Node0x10c582ee0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph3:\l|  %11 = getelementptr float, ptr %1, i64 %5\l  br label %17\l}"];
+	Node0x10c582ee0 -> Node0x10c5830e0;
+	Node0x10c582e20 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{12:\l|  %13 = phi i64 [ 0, %.lr.ph ], [ %15, %12 ]\l  %14 = getelementptr inbounds nuw float, ptr %9, i64 %13\l  store float 1.000000e+00, ptr %14, align 4, !noalias !1\l  %15 = add nuw nsw i64 %13, 1\l  %16 = icmp slt i64 %15, %7\l  br i1 %16, label %12, label %.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x10c582e20:s0 -> Node0x10c582e20;
+	Node0x10c582e20:s1 -> Node0x10c582c20;
+	Node0x10c5830e0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{17:\l|  %18 = phi i64 [ 0, %.lr.ph3 ], [ %25, %17 ]\l  %19 = getelementptr inbounds nuw float, ptr %1, i64 %18\l  %20 = load float, ptr %19, align 4, !alias.scope !1\l  %21 = getelementptr inbounds nuw float, ptr %11, i64 %18\l  %22 = load float, ptr %21, align 4, !noalias !1\l  %23 = fadd float %20, %22\l  %24 = fadd float %23, 1.000000e+00\l  store float %24, ptr %21, align 4, !noalias !1\l  %25 = add nuw nsw i64 %18, 1\l  %26 = icmp slt i64 %25, %5\l  br i1 %26, label %17, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10c5830e0:s0 -> Node0x10c5830e0;
+	Node0x10c5830e0:s1 -> Node0x10c582f80;
+	Node0x10c582f80 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{._crit_edge:\l|  ret void\l}"];
+}

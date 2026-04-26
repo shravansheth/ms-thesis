@@ -1,0 +1,12 @@
+{
+	"InstallScripts" : 
+	[
+		"/Volumes/ShravsSSD/ms-thesis-copy/pass/build/cmake_install.cmake",
+		"/Volumes/ShravsSSD/ms-thesis-copy/pass/build/include/cmake_install.cmake",
+		"/Volumes/ShravsSSD/ms-thesis-copy/pass/build/include/AliasMetaPropagation/cmake_install.cmake",
+		"/Volumes/ShravsSSD/ms-thesis-copy/pass/build/lib/cmake_install.cmake",
+		"/Volumes/ShravsSSD/ms-thesis-copy/pass/build/plugin/cmake_install.cmake",
+		"/Volumes/ShravsSSD/ms-thesis-copy/pass/build/tools/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

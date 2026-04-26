@@ -1,0 +1,10 @@
+digraph "CFG for 'vectorize_split' function" {
+	label="CFG for 'vectorize_split' function";
+
+	Node0x10a4939f0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{6:\l|  store float 1.000000e+00, ptr %1, align 4\l  %7 = getelementptr float, ptr %1, i64 %5\l  br label %8\l}"];
+	Node0x10a4939f0 -> Node0x10a496df0;
+	Node0x10a496df0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{8:\l|  %9 = phi i64 [ 0, %6 ], [ %14, %8 ]\l  %10 = load float, ptr %1, align 4\l  %11 = getelementptr float, ptr %7, i64 %9\l  %12 = load float, ptr %11, align 4\l  %13 = fadd float %10, %12\l  store float %13, ptr %11, align 4\l  %14 = add nuw nsw i64 %9, 1\l  %15 = icmp samesign ult i64 %9, 1048575\l  br i1 %15, label %8, label %16\l|{<s0>T|<s1>F}}"];
+	Node0x10a496df0:s0 -> Node0x10a496df0;
+	Node0x10a496df0:s1 -> Node0x10a4970e0;
+	Node0x10a4970e0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{16:\l|  ret void\l}"];
+}

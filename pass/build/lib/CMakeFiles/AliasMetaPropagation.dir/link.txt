@@ -1,0 +1,2 @@
+/usr/bin/ar qc libAliasMetaPropagation.a CMakeFiles/obj.AliasMetaPropagation.dir/MarkAliasGroupsPass.cpp.o CMakeFiles/obj.AliasMetaPropagation.dir/LowerWithAliasMetaPass.cpp.o
+/usr/bin/ranlib libAliasMetaPropagation.a

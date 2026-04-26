@@ -1,0 +1,18 @@
+digraph "CFG for 'matrix_row_split' function" {
+	label="CFG for 'matrix_row_split' function";
+
+	Node0x10a766f60 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{8:\l|  store float 1.000000e+00, ptr %1, align 4, !alias.scope !1\l  %9 = icmp sgt i64 %7, 0\l  br i1 %9, label %.preheader.lr.ph, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10a766f60:s0 -> Node0x10a767090;
+	Node0x10a766f60:s1 -> Node0x10a767210;
+	Node0x10a767090 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#ec7f6370" fontname="Courier",label="{.preheader.lr.ph:\l|  %.idx = shl i64 %7, 11\l  %10 = getelementptr i8, ptr %1, i64 %.idx\l  br label %.preheader\l}"];
+	Node0x10a767090 -> Node0x10a767370;
+	Node0x10a767370 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.preheader:\l|  %11 = phi i64 [ 0, %.preheader.lr.ph ], [ %23, %22 ]\l  %12 = shl nuw nsw i64 %11, 9\l  br label %13\l}"];
+	Node0x10a767370 -> Node0x10a7675b0;
+	Node0x10a7675b0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{13:\l|  %14 = phi i64 [ 0, %.preheader ], [ %20, %13 ]\l  %15 = add nuw nsw i64 %14, %12\l  %16 = getelementptr inbounds nuw float, ptr %1, i64 %15\l  %17 = load float, ptr %16, align 4, !alias.scope !1\l  %18 = fadd float %17, 1.000000e+00\l  %19 = getelementptr inbounds nuw float, ptr %10, i64 %15\l  store float %18, ptr %19, align 4, !noalias !1\l  %20 = add nuw nsw i64 %14, 1\l  %21 = icmp samesign ult i64 %14, 511\l  br i1 %21, label %13, label %22\l|{<s0>T|<s1>F}}"];
+	Node0x10a7675b0:s0 -> Node0x10a7675b0;
+	Node0x10a7675b0:s1 -> Node0x10a767480;
+	Node0x10a767480 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{22:\l|  %23 = add nuw nsw i64 %11, 1\l  %24 = icmp slt i64 %23, %7\l  br i1 %24, label %.preheader, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10a767480:s0 -> Node0x10a767370;
+	Node0x10a767480:s1 -> Node0x10a767210;
+	Node0x10a767210 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{._crit_edge:\l|  ret void\l}"];
+}

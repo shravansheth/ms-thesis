@@ -1,132 +1,136 @@
 # MLIR → LLVM Alias Metadata Thesis
 
-This repository contains the experimental harness, kernels, scripts, and notes
-for my M.S. thesis on propagating alias and memory metadata from MLIR to LLVM IR
-to improve LLVM middle-end optimizations for GPU-oriented code.
+This repository contains the experimental infrastructure, kernels, scripts, and documentation
+for a master's thesis on propagating alias metadata from MLIR to LLVM IR to improve middle-end
+optimizations on CPU targets.
 
-## What this repo contains
-- `kernels/`   : Test kernels (C, MLIR, GPU)
-- `pipelines/`: MLIR pass pipelines used in experiments
-- `scripts/`  : Reproducible scripts for lowering and analysis
-- `outputs/`  : Generated IR and optimization remarks
-- `notes/`    : Lab notebook and experiment logs
+The core contribution is a two-pass out-of-tree MLIR system (`pass/`) that detects structurally
+disjoint `memref.subview` pairs before the MLIR-to-LLVM lowering boundary and emits LLVM
+`!alias.scope`/`!noalias` metadata, enabling LICM, GVN, and vectorization that LLVM cannot
+perform without this information.
 
-## What this repo does NOT contain
-- The LLVM/MLIR source tree (`llvm-project`)
-- Any compiled binaries or generated IR
+LLVM/MLIR version: see `llvm-version.txt`.
 
-LLVM/MLIR version info is recorded in `llvm-version.txt`.
+---
 
 ## Repository Structure
-This repository contains the experimental harness and documentation for the thesis.
-It does not contain the LLVM/MLIR source tree.
+
 ```
-mlir-alias-thesis/
-├── kernels/          # Input kernels (MLIR, C, GPU)
-├── scripts/          # Reproducible pipelines and analysis scripts
-├── pipelines/        # Documented MLIR lowering pipelines
-├── outputs/          # Generated IR and remarks
-├── cases/            # Tracked writeups of diagnostic evidence
-├── notes/            # Lab notes / scratch
-├── llvm-version.txt  # LLVM commit + version used
-└── README.md
+ms-thesis/
+├── pass/                          # Out-of-tree MLIR pass (main contribution)
+│   ├── lib/                       # MarkAliasGroupsPass.cpp, LowerWithAliasMetaPass.cpp
+│   ├── include/                   # Passes.h, Passes.td
+│   ├── tools/                     # alias-meta-opt.cpp (standalone driver binary)
+│   ├── plugin/                    # AliasMetaPlugin.cpp (not used — ODR issues on macOS)
+│   └── build/                     # Build output (gitignored)
+│       └── bin/alias-meta-opt     # Standalone pass binary
+├── kernels/mlir/                  # MLIR kernel sources (case-study + exploratory)
+├── outputs/                       # Baseline, oracle, and pass artifacts per case-study kernel
+├── pass_outputs/                  # Pass pipeline outputs organized by kernel
+├── microbenchmark/                # Microbenchmark MLIR kernels (10 kernels)
+├── microbench_outputs/            # Microbenchmark IR (baseline/ and with_meta/ per kernel)
+├── benchmarks/                    # C timing harnesses (bench_<name>.c, bench.h)
+├── bench_outputs/                 # Compiled benchmark binaries per platform (rpi3b/, rpi4b/, rpi5/)
+├── linalg_benchmarks/             # Linalg benchmark kernels, scripts, and outputs
+├── tests/                         # Correctness test harnesses
+├── cases/                         # 6 valid case-study documents
+├── invalid_cases/                 # 5 invalidated case documents with rationale
+├── prev_cases/                    # Earlier case drafts (superseded)
+├── docs/                          # Project documentation
+│   ├── thesis-summary.md          # Concise project summary with results
+│   ├── project-brief.md           # Full technical context and pass design
+│   ├── implementation-log.md      # Implementation decisions and validation
+│   ├── pass-build-notes.md        # Build instructions and API reference
+│   ├── benchmark-rpi3b.md         # RPi 3B (Cortex-A53) benchmark analysis
+│   ├── benchmark-rpi4b.md         # RPi 4B (Cortex-A72) benchmark analysis
+│   ├── benchmark-rpi5.md          # RPi 5 (Cortex-A76) benchmark analysis
+│   └── benchmark-cross-platform.md
+├── thesis-reference/              # Per-topic reference docs for thesis writing
+├── scripts/                       # Pipeline and benchmark scripts
+├── pipelines/                     # Documented MLIR lowering pipelines
+├── cgeist-tests/                  # Polygeist (cgeist) exploration
+├── notes/                         # Lab notes and scratch
+├── case_exploration_log.md        # Chronological case exploration log
+├── workflow.md                    # Experiment workflow reference
+├── thesis_stmt.txt                # Thesis statement
+├── mlir-opt-passes.txt            # mlir-opt pass list reference
+└── llvm-version.txt               # LLVM commit and version used
 ```
+
+---
 
 ## Build Prerequisites
-You must have a local build of LLVM + MLIR.
 
-This repo assumes the following tools are available on your PATH:
-- mlir-opt
-- mlir-translate
-- opt
-- llc
+A local LLVM/MLIR build is required. The following tools must be on your PATH or referenced
+by absolute path in the scripts:
 
-The exact LLVM version and commit used are recorded in llvm-version.txt.
+- `mlir-opt`, `mlir-translate` — from the LLVM build
+- `opt`, `llc` — from the LLVM build
+- `alias-meta-opt` — the standalone pass binary (built below)
 
-## Workflow: Running Experiments
-Each experiment follows the same three-stage flow:
-1. Lower MLIR → LLVM dialect → LLVM IR
-2. Run LLVM optimizations
-3. Inspect optimized IR and/or optimization remarks
+Paths are set in the scripts. See `docs/pass-build-notes.md` for full details.
 
-All steps are scripted for reproducibility.
+---
 
-### Step 1: Lower MLIR to LLVM IR (CPU Pipeline)
-From the repo root:
-```
-scripts/run_pipeline_cpu.sh \
-  kernels/mlir/<kernel>.mlir \
-  outputs/<name>/<name>
+## Building the Pass
+
+CMake is already configured. From the repo root:
+
+```bash
+cd pass/build
+make -j4
 ```
 
-This produces:
-- outputs/<name>/<name>.llvm_dialect.mlir
-- outputs/<name>/<name>.ll
+Binary: `pass/build/bin/alias-meta-opt`
 
-Example:
-```
-scripts/run_pipeline_cpu.sh \
-  kernels/mlir/hoist_candidate.mlir \
-  outputs/hoist/hoist
-```
+To reconfigure from scratch (only needed if `CMakeLists.txt` changes):
 
-### Step 2: Run LLVM optimizations and emit optimized IR
-To run the default -O2 pipeline and emit optimized LLVM IR:
-```
-scripts/run_opt_emit_ll.sh \
-  outputs/<name>/<name>.ll \
-  outputs/<name>/<name>.O2.ll \
-  outputs/<name>/remarks.O2.yml
-```
-Example:
-```
-scripts/run_opt_emit_ll.sh \
-  outputs/hoist/hoist.ll \
-  outputs/hoist/hoist.O2.ll \
-  outputs/hoist/remarks.O2.yml
+```bash
+cd pass/build
+cmake .. \
+  -DMLIR_DIR=/Users/shravansheth/ShravsSSD/llvm-project/build/lib/cmake/mlir \
+  -DLLVM_DIR=/Users/shravansheth/ShravsSSD/llvm-project/build/lib/cmake/llvm
+make -j4
 ```
 
-This produces:
-- optimized LLVM IR (*.O2.ll)
-- YAML optimization remarks (remarks.O2.yml)
+---
 
-## Optional: Manual Oracle Test (LLVM IR)
+## Running Experiments
 
-For diagnostic purposes, it is sometimes useful to manually add aliasing metadata to LLVM IR to confirm that missing metadata is the root cause of a missed optimization.
+### Baseline pipeline (no alias metadata)
 
-Workflow:
-1. Copy the baseline IR:
-```
-cp outputs/<name>/<name>.ll outputs/<name>/<name>.noalias.ll
-```
-
-2. Edit the function signature to add noalias where appropriate.
-3. Re-run optimization:
-```
-scripts/run_opt_emit_ll.sh \
-  outputs/<name>/<name>.noalias.ll \
-  outputs/<name>/<name>.noalias.O2.ll \
-  outputs/<name>/remarks.noalias.O2.yml
+```bash
+bash scripts/run_pipeline_cpu.sh kernels/mlir/<name>.mlir outputs/<name>/<name>
+bash scripts/run_opt_emit_ll.sh \
+    outputs/<name>/<name>.ll \
+    outputs/<name>/<name>.O2.ll \
+    outputs/<name>/remarks.O2.yml
 ```
 
-Comparing <name>.O2.ll vs <name>.noalias.O2.ll isolates the effect of alias disambiguation.
+### With alias metadata pass
 
-## Adding a new kernel
-1. Add the kernel under `kernels/mlir/`
-2. Run the CPU pipeline:
-```
-scripts/run_pipeline_cpu.sh \
-  kernels/mlir/my_kernel.mlir \
-  outputs/my_kernel/my_kernel
-```
-
-3. Run LLVM optimization:
-```
-scripts/run_opt_emit_ll.sh \
-  outputs/my_kernel/my_kernel.ll \
-  outputs/my_kernel/my_kernel.O2.ll \
-  outputs/my_kernel/remarks.O2.yml
+```bash
+bash scripts/run_pipeline_cpu_with_meta.sh kernels/mlir/<name>.mlir outputs/<name>/<name>.meta
+bash scripts/run_opt_emit_ll.sh \
+    outputs/<name>/<name>.meta.ll \
+    outputs/<name>/<name>.meta.O2.ll \
+    outputs/<name>/remarks.meta.O2.yml
 ```
 
-4. If the kernel reveals an interesting optimization behavior, document it under: `cases/caseX_my_kernel.md`
+### Correctness tests
 
+```bash
+bash scripts/run_correctness_tests.sh
+```
+
+All 6 case-study kernels pass (checksums match baseline for all observable kernels).
+
+---
+
+## Results
+
+32 baseline alias-related optimization misses across 6 kernels → 0 with the pass.
+
+Key results: ~1.12× on in-order (A53), ~1.16–1.28× on OOO (A72), 3.76× vectorization
+speedup on macOS. See `docs/thesis-summary.md` for the full summary and
+`thesis-reference/benchmarks.md` for detailed per-platform analysis.

@@ -1,0 +1,5 @@
+digraph "CFG for 'caller' function" {
+	label="CFG for 'caller' function";
+
+	Node0x108d85530 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{11:\l|  %12 = sub i64 512, %10\l  store float 1.000000e+00, ptr %1, align 4, !alias.scope !1\l  store float 2.000000e+00, ptr %6, align 4, !alias.scope !4\l  tail call void @stencil_a.__alias_meta_0(ptr poison, ptr nonnull %1, i64 0,\l... i64 poison, i64 poison, ptr poison, ptr nonnull %1, i64 512, i64 poison, i64\l... poison, i64 512) #1\l  tail call void @stencil_b.__alias_meta_1(ptr poison, ptr nonnull %6, i64 0,\l... i64 poison, i64 poison, ptr poison, ptr nonnull %6, i64 %10, i64 poison, i64\l... poison, i64 %12) #1\l  ret void\l}"];
+}

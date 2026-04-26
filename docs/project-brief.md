@@ -165,9 +165,9 @@ pass is the mechanism that generates this metadata automatically from MLIR.
 
 ---
 
-## 4. Valid Cases Found
+## 4. Valid Cases Found (6 Total)
 
-All 5 valid cases use `!alias.scope`/`!noalias` as the oracle mechanism. All cases
+All 6 valid cases use `!alias.scope`/`!noalias` as the oracle mechanism. All cases
 target LICM as the primary missed optimization (some also show GVN/vectorization misses).
 
 ### The Structural Pattern: Partition-by-Endpoint
@@ -344,6 +344,32 @@ cases) → `src[0]` hoisted to loop preheader, callee stays noinline.
 | Proof source | Static MLIR types (offset: 0, offset: 512) | Runtime arithmetic chain (`muli + addi`) |
 | Pass effort | Read static type attributes | Trace SSA arithmetic chain |
 | Representative of | Static kernel specialization | Dynamic tiling / streaming access |
+
+---
+
+### Case 6: `vectorize_split` (Dynamic Split Blocks LICM and Vectorization)
+**File**: `kernels/mlir/vectorize_split.mlir` | `cases/case_vectorize_split.md`
+
+**Pattern**: A 2M-element buffer is split at a runtime offset `%n` into `lo = A[0..n-1]` (dynamic
+size) and `hi = A[n..n+1M-1]` (static size 1M). The static hi size gives the vectorizer a known
+trip count once alias uncertainty is removed. The kernel seeds `lo[0] = 1.0`, then loops 1M
+iterations: `hi[i] += lo[0]`.
+
+**Missed optimizations**: LICM × 4 (`LoadWithLoopInvariantAddressInvalidated`),
+GVN × 2 (`LoadClobbered`), vectorization (`UnsafeDep`). The `UnsafeDep` is a **safety failure** —
+not a cost-model decision. Even `-force-vector-width=4` cannot override it.
+
+**Three-pass cascade on pass output**:
+1. `!noalias` on hi stores → LICM hoists `lo[0]`
+2. Hoisted `lo[0]` sees only the pre-loop `store float 1.0` → SCCP folds to `1.000000e+00`, load
+   disappears from IR
+3. Loop reduces to `hi[i] += 1.0` — static trip count, no aliasing concern → SIMD vectorized
+
+**Oracle**: `!alias.scope`/`!noalias` → all 7 misses resolved, loop vectorized with fvw4.
+
+**What distinguishes this from `dynamic_split`**: The hi size is static (1M), giving the
+vectorizer a known trip count. In `dynamic_split`, the dynamic `%hi_size` causes the cost model
+to decline vectorization even after the safety block is removed.
 
 ---
 
@@ -572,64 +598,118 @@ the right two operands. This handles all depth-1 arithmetic chains automatically
 
 ## 8. Benchmarking and Evaluation
 
-### Evaluation Strategy (Overview)
+### Evaluation Strategy
 
-The evaluation should demonstrate three things:
-1. The pass correctly identifies the structural patterns (precision/recall on the case set)
-2. The emitted metadata enables the optimizations that were missed before
-3. The overall impact on real benchmark performance is measurable
+The evaluation demonstrates three things:
+1. The pass correctly identifies the structural patterns (32 baseline misses → 0 across all 6 kernels)
+2. The emitted metadata enables the optimizations that were missed (remarks confirm, IR confirms)
+3. The impact on real benchmark performance is measurable across hardware platforms
 
-The comparison will be three-way:
-- **Baseline**: Standard MLIR → LLVM lowering, no metadata (current behavior)
-- **Oracle**: Manually annotated LLVM IR (the gold standard — proves the metadata works)
-- **Pass**: Automatic metadata emission — should match or approximate oracle performance
+The comparison is three-way:
+- **Baseline**: Standard MLIR → LLVM lowering, no alias metadata
+- **Oracle**: Manually annotated LLVM IR (proves the metadata approach is sound, independent of the pass)
+- **Pass**: Automatic metadata emission — matches oracle miss counts on all 6 kernels
 
-### Source Language Options
+### Completed Evaluation: Six Case-Study Kernels
 
-| Source | Path to MLIR | Notes |
+The primary evaluation is six hand-written MLIR kernels, each exercising a distinct structural
+variant of the partition-by-endpoint pattern. Hand-written kernels are the right scope: the thesis
+claims to detect and propagate a specific structural pattern, and the six cases cover all distinct
+variants of that pattern (Form A, Form B, Form C, intra-function, cross-function noinline,
+vectorization-enabling).
+
+Standard benchmark suites (PolyBench, NPB, etc.) do not naturally produce `memref.subview` ops
+and do not exercise the pass without additional pipeline steps that introduce their own variables.
+The six kernels provide clean, controlled validation of the thesis claims.
+
+**Remarks results** (across all 6 kernels):
+
+| Metric | Baseline | Pass |
 |---|---|---|
-| MLIR directly | Already in MLIR | Simplest — full control, exactly targets the patterns |
-| **C/C++ via Clang + Polly** | Clang → LLVM → Polly → MLIR | Common HPC path; Polly can emit MLIR affine dialect |
-| **Triton** (GPU kernel DSL) | Triton → Triton IR → MLIR → LLVM | Very relevant for ML workloads; uses linalg/tensor dialects |
-| **Flang** (Fortran via MLIR) | Flang → MLIR → LLVM | HPC Fortran code; many standard benchmarks in Fortran |
-| **Julia** | Julia → LLVM (not MLIR by default) | Less direct path; likely not the right choice |
+| Alias-related misses (`LoadWithLoopInvariantAddressInvalidated` + `LoadClobbered`) | 32 | **0** |
+| Successful LICM hoists | 13 | **16** |
+| Hot-loop memory reads/iter | 2 | **1** (all 5 LICM kernels) |
+| `UnsafeDep` vectorization blocks | 1 | **0** |
 
-**Recommended**: Use MLIR directly for case validation, and **C/C++ via Polly** or
-**Triton-generated MLIR** for the evaluation benchmarks. These are the most realistic
-paths that expose the patterns identified in the thesis.
+**Correctness**: `scripts/run_correctness_tests.sh` — 6/6 kernels pass numeric checksum
+comparison between baseline and pass binaries.
 
-### Benchmark Suites
+### Cross-Platform Wall-Clock Benchmarks
 
-| Suite | Description | Relevance |
-|---|---|---|
-| **PolyBench/C** | ~30 polyhedral kernels (2D/3D stencils, matrix ops, linear algebra) | High — directly exposes tiling, subview-like loop patterns. Standard in polyhedral compiler evaluation. |
-| **MLIR benchmark suite** (in-tree `mlir/test/mlir-cpu-runner/`) | Small MLIR-specific tests | Good for regression testing, limited scale |
-| **BLAS/LAPACK kernels** | `gemm`, `gemv`, `trsm`, etc. | High — tiling patterns are pervasive; `gemm` tiling is exactly the `matrix_row_split` / `tiling_noinline` pattern |
-| **NAS Parallel Benchmarks (NPB)** | 9 benchmarks (BT, CG, FT, LU, MG, SP, UA, IS, EP) | Moderate — large scale, HPC relevant, available in C and Fortran |
-| **Rodinia** | GPU/CPU benchmarks (HotSpot, Pathfinder, LUD, etc.) | Moderate — originally for GPU; some CPU variants available |
+Wall-clock benchmarks on four platforms expose qualitatively different mechanisms by which alias
+uncertainty affects runtime performance. RPi binaries cross-compiled on Apple Silicon via
+`zig cc --target=aarch64-linux-musl -static` with `llc -mcpu=<cortex-a53|a72|a76>`. Timing uses
+`CLOCK_MONOTONIC_RAW`, minimum of 5 rounds, after warmup.
 
-**Recommended starting point**: **PolyBench/C** lowered through Polly to MLIR, plus the
-5 hand-written MLIR kernels from the case study. PolyBench is the standard evaluation
-suite for loop optimizers and is directly comparable to prior work.
+**Three cost regimes:**
+
+| Regime | Hardware | Mechanism | Representative speedup |
+|---|---|---|---|
+| In-order | RPi 3B (A53, ~1.2 GHz) | One `ldr` removed from critical path per iteration | ~1.12× (all simple hoist cases) |
+| Shallow OOO | RPi 4B (A72, 1.5 GHz) | LSU disambiguation overhead eliminated across all loop iterations | 1.16–1.28× (scales with relationship count) |
+| Deep OOO | RPi 5 (A76, ~1.5 GHz) | Simple hoists persist; complex relationships absorbed; one regression | 0.88–1.28× |
+| Vectorization | macOS (Apple M-series) | UnsafeDep safety block removed → NEON SIMD enabled | **3.76×** (`vectorize_split`) |
+
+Key non-obvious results:
+- OOO benefit equals or exceeds in-order benefit for simple hoist cases (A72 1.16× > A53 1.12×)
+  because LSU disambiguation overhead is an OOO-specific cost that vanishes when the load is hoisted
+- `double_invariant` (two invariant loads): A72 1.28× vs A53 1.08× — non-linear OOO overhead
+- `matrix_row_split` (32,768 inner stores checking one outer-loop load): A72 1.20×, A53/A76 noise
+- `tiling_noinline` on A76: genuine 0.88× regression, reproducible, cause not established
+- `vectorize_split` on A72: 0.91× regression (DRAM-bound at 8 MB working set, ~6 GB/s LPDDR4)
+
+Full per-platform analysis: `docs/benchmark-rpi3b.md`, `docs/benchmark-rpi4b.md`,
+`docs/benchmark-rpi5.md`, `docs/benchmark-cross-platform.md`, `thesis-reference/benchmarks.md`.
+
+### External Benchmarks (For Advisor)
+
+If external benchmark coverage is required, the only practical options that produce the
+`memref.subview` patterns the pass targets are:
+
+**Option 1 — MLIR linalg tiling** (primary recommendation)
+
+Start from `linalg.matmul` or `linalg.generic` and apply MLIR's `-linalg-tile` transform.
+Tiling produces `memref.subview` pairs at tile boundaries — exactly the partition-by-endpoint
+pattern the pass detects. These kernels are real compiler-generated code (not hand-written),
+they are already benchmarked in the MLIR ecosystem, and they require no new pipeline
+infrastructure beyond adding a tiling step before our passes.
+
+Pipeline:
+```
+input.mlir (linalg.matmul)
+  → mlir-opt --linalg-tile="tile-sizes=64,64,64"
+  → alias-meta-opt --mark-alias-groups --lower-with-alias-meta
+  → mlir-opt <standard lowering passes>
+  → llc + benchmark harness
+```
+
+Strongest candidates: `linalg.matmul` tiled on the M-dimension (matches `matrix_row_split`
+pattern), `linalg.generic` eltwise with a dynamic split (matches `dynamic_split` pattern).
+
+**Option 2 — PolyBench/C via Polygeist (cgeist)**
+
+PolyBench kernels compiled through cgeist produce MLIR affine dialect. A subsequent
+`--affine-loop-tile` pass then generates `memref.subview` ops. Most useful kernels:
+`gemm`, `jacobi-2d`, `heat-3d`. Requires verifying the generated subview form matches what
+the pass detects (Form A/B/C).
+
+Caution: PolyBench static-offset kernels (constant tiling) may already be handled by LLVM 22's
+GEP constant arithmetic, leaving no observable speedup from our pass. Dynamic tiling variants
+are needed to produce the runtime-unknown offset case the pass targets.
+
+Other benchmark suites (Triton, Flang, Julia, NPB, Rodinia) are not practical for this thesis:
+Triton targets GPU, Flang and Julia have no direct MLIR subview path, NPB and Rodinia are too
+complex to lower cleanly through the CPU pipeline.
 
 ### Metrics
 
-| Metric | How to Measure | What It Shows |
+| Metric | How | What It Shows |
 |---|---|---|
-| **Optimizations enabled** (static) | Count `Hoisted` / eliminated loads per remarks | How many optimization opportunities the pass opens |
-| **Instruction count reduction** | `llvm-mca` or counting IR instructions before/after O2 | Code quality improvement |
-| **Runtime speedup** | `perf stat` or `time` on compiled binaries | Actual performance impact |
-| **Vectorization rate** | Count vectorized loops in O2 IR | Impact on auto-vectorization |
-| **Compilation overhead** | Wall-clock time of pass execution | Cost of running the pass |
-
-### Evaluation Methodology
-
-1. For each benchmark kernel:
-   - Run baseline → record misses and runtime
-   - Run oracle → record passes and runtime (upper bound for the pass)
-   - Run with pass → record passes and runtime
-2. Report: `pass_speedup / oracle_speedup` as a coverage ratio (ideally close to 1.0)
-3. For cases where pass < oracle: identify the pattern the pass missed and document why
+| Alias-related misses | Count `LoadWithLoopInvariantAddressInvalidated` + `LoadClobbered` in remarks | Alias uncertainty eliminated |
+| LICM hoists enabled | Count `Hoisted` delta (pass − baseline) | Optimizations unblocked |
+| Vectorization unblocked | `UnsafeDep` → `Vectorized` or `VectorizationNotBeneficial` | Safety block resolved |
+| Hot-loop load count | Loads/iter in O2 IR body | Code quality impact |
+| Runtime speedup | ns/call (min of 5 rounds, after warmup) | Actual performance impact |
 
 ---
 
@@ -637,61 +717,99 @@ suite for loop optimizers and is directly comparable to prior work.
 
 ```
 ms-thesis-copy/
-├── kernels/mlir/              # MLIR kernel sources
-│   ├── subview_noalias.mlir
-│   ├── dynamic_split.mlir
-│   ├── adjacent_tiles.mlir
-│   ├── matrix_row_split.mlir
-│   └── tiling_noinline.mlir
-├── outputs/<name>/            # Per-kernel outputs
-│   ├── <name>.ll              # Baseline LLVM IR (post-lowering)
-│   ├── <name>.O2.ll           # Baseline after O2
-│   ├── remarks.O2.yml         # Optimization remarks
-│   ├── <name>.oracle.ll       # Manually annotated oracle
-│   └── <name>.oracle.O2.ll   # Oracle after O2 (validates the fix)
-├── cases/                     # Valid case documentation
+├── pass/                          # Out-of-tree MLIR pass (main contribution)
+│   ├── lib/                       # MarkAliasGroupsPass.cpp, LowerWithAliasMetaPass.cpp
+│   ├── include/AliasMetaPropagation/ # Passes.h, Passes.td
+│   ├── tools/                     # alias-meta-opt.cpp (standalone driver)
+│   ├── plugin/                    # AliasMetaPlugin.cpp (not used — ODR issues on macOS)
+│   └── build/bin/alias-meta-opt   # Standalone pass binary (gitignored)
+├── kernels/mlir/                  # MLIR kernel sources (18 files)
+│   ├── subview_noalias.mlir       # Case 1: noinline callee, static offsets
+│   ├── dynamic_split.mlir         # Case 2: 1D runtime partition
+│   ├── adjacent_tiles.mlir        # Case 3: tile boundary via addi chain
+│   ├── matrix_row_split.mlir      # Case 4: 2D row split
+│   ├── tiling_noinline.mlir       # Case 5: noinline + runtime addi chain
+│   ├── vectorize_split.mlir       # Case 6: SIMD vectorization enabling
+│   └── ...                        # Exploratory and invalidated kernels
+├── outputs/<name>/                # Per-kernel artifacts
+│   ├── <name>.ll                  # Baseline LLVM IR
+│   ├── <name>.O2.ll               # Baseline after O2
+│   ├── remarks.O2.yml             # Baseline optimization remarks
+│   ├── <name>.oracle.ll           # Manually annotated oracle
+│   ├── <name>.oracle.O2.ll        # Oracle after O2
+│   ├── <name>.meta.ll             # Pass LLVM IR
+│   └── <name>.meta.O2.ll          # Pass after O2
+├── pass_outputs/<name>/           # Pass pipeline outputs (baseline/ and with_meta/)
+├── microbenchmark/                # Microbenchmark MLIR kernels
+├── microbench_outputs/<name>/     # Microbenchmark IR (baseline/ and with_meta/)
+├── benchmarks/                    # C timing harnesses (bench_<name>.c, bench.h)
+├── bench_outputs/<name>/          # Compiled binaries per platform (rpi3b/, rpi4b/, rpi5/)
+├── tests/                         # Correctness test harnesses (test_<name>.c)
+├── cases/                         # 6 valid case documents
 │   ├── case1_noalias_func.md
 │   ├── case_dynamic_split.md
 │   ├── case_adjacent_tiles.md
 │   ├── case_matrix_row_split.md
-│   └── case_tiling_noinline.md
-├── invalid_cases/             # Invalidated case documentation
+│   ├── case_tiling_noinline.md
+│   └── case_vectorize_split.md
+├── invalid_cases/                 # 5 invalidated case documents with rationale
 ├── docs/
-│   └── project-brief.md      # This document
+│   ├── thesis-summary.md          # Concise project summary with results
+│   ├── project-brief.md           # This document
+│   ├── implementation-log.md      # Implementation decisions, problems, validation
+│   ├── pass-build-notes.md        # Build instructions and API reference
+│   ├── benchmark-rpi3b.md         # RPi 3B (A53) benchmark analysis
+│   ├── benchmark-rpi4b.md         # RPi 4B (A72) benchmark analysis
+│   ├── benchmark-rpi5.md          # RPi 5 (A76) benchmark analysis
+│   └── benchmark-cross-platform.md
+├── thesis-reference/              # Per-topic reference docs for thesis writing
+│   ├── thesis-argument.md
+│   ├── pass-design.md
+│   ├── pass1-implementation.md
+│   ├── pass2-implementation.md
+│   ├── case-studies.md
+│   ├── optimization-results.md
+│   ├── benchmarks.md
+│   ├── llvm-alias-metadata.md
+│   ├── mlir-to-llvm-lowering.md
+│   └── invalidated-cases.md
 ├── scripts/
-│   ├── run_pipeline_cpu.sh   # MLIR → LLVM IR lowering
-│   └── run_opt_emit_ll.sh    # LLVM O2 + remarks
-├── case_exploration_log.md   # Chronological exploration log
-└── thesis-summary.md         # High-level thesis summary
+│   ├── run_pipeline_cpu.sh        # Baseline MLIR → LLVM IR pipeline
+│   ├── run_pipeline_cpu_with_meta.sh # Pass pipeline (alias-meta-opt → mlir-opt)
+│   ├── run_opt_emit_ll.sh         # O2 optimization + remarks
+│   ├── run_correctness_tests.sh   # Correctness verification
+│   ├── run_benchmarks.sh          # macOS wall-clock benchmarks
+│   ├── cross_compile_rpi.sh       # Cross-compile for RPi 3B/4B/5
+│   └── run_rpi_benchmarks.sh      # Run benchmarks on RPi via SSH
+├── cgeist-tests/                  # Polygeist (cgeist) exploration
+├── case_exploration_log.md        # Chronological exploration log
+└── llvm-version.txt
 ```
 
 ---
 
-## 10. Current Status and What Comes Next
+## 10. Current Status
 
-### Done
-- [x] Identified 5 valid cases with confirmed LICM/GVN/vectorization misses
-- [x] Built and validated manual oracles for all 5 cases (all pass)
+### Completed
+
+- [x] Identified 6 valid cases with confirmed LICM/GVN/vectorization misses
+- [x] Built and validated manual oracles for all 6 cases
 - [x] Documented all cases with detailed structural analysis
-- [x] Established the structural proof methodology (partition-by-endpoint)
-- [x] Confirmed what LLVM 22 can and cannot prove
+- [x] Confirmed what LLVM 22 can and cannot prove (boundary between valid and invalidated cases)
+- [x] Implemented `MarkAliasGroupsPass` (Pass 1) — all three disjointness forms, noinline callee specialization
+- [x] Implemented `LowerWithAliasMetaPass` (Pass 2) — partial conversion, alias scope metadata emission
+- [x] Standalone binary `alias-meta-opt` working; plugin approach abandoned (macOS ODR)
+- [x] Pipeline script `run_pipeline_cpu_with_meta.sh` — alias-meta-opt → mlir-opt two-step
+- [x] Validated: 32 baseline alias misses → 0 across all 6 kernels
+- [x] Correctness tests: 6/6 kernels pass numeric checksum comparison
+- [x] Wall-clock benchmarks on macOS (Apple M-series), RPi 3B (A53), RPi 4B (A72), RPi 5 (A76)
 
-### Next: Pass Implementation
+### In Progress
 
-The pass design is fully resolved (see Section 7). Implementation tasks in order:
+- [ ] Thesis writing
 
-1. **Implement `MarkAliasGroups`** — walk `memref.subview` ops, check partition-by-endpoint
-   via depth-1 `arith.addi` SSA check, tag affected `memref.load`/`memref.store` with
-   `#alias_group<id>`, tag `func.call` ops for the noinline callee case.
-2. **Implement `LowerWithAliasMeta`** — targeted `DialectConversion` pass: custom
-   `LoadOpLowering`/`StoreOpLowering` patterns for marked ops (using `MemRefDescriptor` +
-   `LLVMTypeConverter`), emit `LLVM::AliasScopeAttr` / `LLVM::AliasScopeDomainAttr`,
-   add `llvm.noalias` params for the callee case.
-3. **Wire into the pipeline** — insert both passes between `-fold-memref-alias-ops` and
-   `-expand-strided-metadata` in `run_pipeline_cpu.sh`.
-4. **Test against the 5 valid cases** — confirm pass output matches oracle IR.
-5. **Test against invalidated cases** — confirm no incorrect metadata is emitted.
-6. **Evaluate on benchmarks** — PolyBench/C via Polly, or the 5 kernels directly.
+### Key Implementation Notes
 
-The oracle files (`outputs/<name>/<name>.oracle.ll`) are the ground truth spec for what
-the pass must produce. Each oracle was validated to confirm the optimization fires.
+See `docs/implementation-log.md` for a detailed record of every implementation decision, problem
+encountered, and resolution. See `docs/pass-build-notes.md` for build instructions and API
+reference. See `thesis-reference/` for per-topic reference docs organized for thesis writing.

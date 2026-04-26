@@ -1,0 +1,28 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        vectorize_split
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Analysis
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        vectorize_split
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...
+--- !Passed
+Pass:            loop-vectorize
+Name:            Vectorized
+Function:        vectorize_split
+Args:
+  - String:          'vectorized '
+  - String:          ''
+  - String:          'loop (vectorization width: '
+  - VectorizationFactor: '4'
+  - String:          ', interleaved count: '
+  - InterleaveCount: '1'
+  - String:          ')'
+...

@@ -1,0 +1,18 @@
+digraph "CFG for 'linalg_norm_split' function" {
+	label="CFG for 'linalg_norm_split' function";
+
+	Node0x10cc4f100 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{6:\l|  %7 = sub i64 2048, %5\l  store float 1.000000e+00, ptr %1, align 4\l  %8 = getelementptr inbounds nuw i8, ptr %1, i64 4\l  store float 2.000000e+00, ptr %8, align 4\l  %9 = icmp sgt i64 %7, 0\l  br i1 %9, label %.lr.ph, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10cc4f100:s0 -> Node0x10cc52b40;
+	Node0x10cc4f100:s1 -> Node0x10cc52cc0;
+	Node0x10cc52b40 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph:\l|  %10 = getelementptr float, ptr %1, i64 %5\l  br label %12\l}"];
+	Node0x10cc52b40 -> Node0x10cc52e20;
+	Node0x10cc52ee0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph2:\l|  %11 = getelementptr float, ptr %1, i64 %5\l  br label %20\l}"];
+	Node0x10cc52ee0 -> Node0x10cc52f30;
+	Node0x10cc52e20 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{12:\l|  %13 = phi i64 [ 0, %.lr.ph ], [ %18, %12 ]\l  %14 = load float, ptr %1, align 4\l  %15 = getelementptr float, ptr %10, i64 %13\l  %16 = load float, ptr %15, align 4\l  %17 = fadd float %14, %16\l  store float %17, ptr %15, align 4\l  %18 = add nuw nsw i64 %13, 1\l  %19 = icmp slt i64 %18, %7\l  br i1 %19, label %12, label %.lr.ph2\l|{<s0>T|<s1>F}}"];
+	Node0x10cc52e20:s0 -> Node0x10cc52e20;
+	Node0x10cc52e20:s1 -> Node0x10cc52ee0;
+	Node0x10cc52f30 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{20:\l|  %21 = phi i64 [ 0, %.lr.ph2 ], [ %26, %20 ]\l  %22 = load float, ptr %8, align 4\l  %23 = getelementptr float, ptr %11, i64 %21\l  %24 = load float, ptr %23, align 4\l  %25 = fmul float %22, %24\l  store float %25, ptr %23, align 4\l  %26 = add nuw nsw i64 %21, 1\l  %27 = icmp slt i64 %26, %7\l  br i1 %27, label %20, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10cc52f30:s0 -> Node0x10cc52f30;
+	Node0x10cc52f30:s1 -> Node0x10cc52cc0;
+	Node0x10cc52cc0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{._crit_edge:\l|  ret void\l}"];
+}

@@ -1,0 +1,84 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        tile_stencil
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        tile_stencil
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        tile_stencil
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Missed
+Pass:            gvn
+Name:            LoadClobbered
+Function:        tile_stencil
+Args:
+  - String:          'load of type '
+  - Type:            float
+  - String:          ' not eliminated'
+  - String:          ' because it is clobbered by '
+  - ClobberedBy:     store
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        tile_stencil
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            inline
+Name:            NeverInline
+Function:        tiling_caller
+Args:
+  - String:          ''''
+  - Callee:          tile_stencil
+  - String:          ''' not inlined into '''
+  - Caller:          tiling_caller
+  - String:          ''' because it should never be inlined '
+  - String:          '(cost=never)'
+  - String:          ': '
+  - Reason:          noinline call site attribute
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        tile_stencil
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        tile_stencil
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...
+--- !Missed
+Pass:            slp-vectorizer
+Name:            NotPossible
+Function:        tile_stencil
+Args:
+  - String:          'Cannot SLP vectorize list: vectorization was impossible'
+  - String:          ' with available vectorization factors'
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        tile_stencil
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
