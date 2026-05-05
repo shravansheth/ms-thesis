@@ -2,18 +2,18 @@
 # Cross-compile benchmark binaries for Raspberry Pi 3B, 4B, and 5.
 #
 # Targets:
-#   rpi3b — Cortex-A53 (aarch64, in-order)
-#   rpi4b — Cortex-A72 (aarch64, light OOO)
-#   rpi5  — Cortex-A76 (aarch64, deep OOO)
+#   rpi3b - Cortex-A53 (aarch64, in-order)
+#   rpi4b - Cortex-A72 (aarch64, light OOO)
+#   rpi5  - Cortex-A76 (aarch64, deep OOO)
 #
 # Requirements:
-#   zig >= 0.12  (brew install zig)  — cross-compiler + static musl libc bundled
+#   zig >= 0.12  (brew install zig)  - cross-compiler + static musl libc bundled
 #   llc from LLVM build with AArch64 backend
 #
 # Outputs:
-#   bench_outputs/<kernel>/rpi3b/<kernel>_{baseline,pass}
-#   bench_outputs/<kernel>/rpi4b/<kernel>_{baseline,pass}
-#   bench_outputs/<kernel>/rpi5/<kernel>_{baseline,pass}
+#   case-study-binaries/<kernel>/rpi3b/<kernel>_{baseline,pass}
+#   case-study-binaries/<kernel>/rpi4b/<kernel>_{baseline,pass}
+#   case-study-binaries/<kernel>/rpi5/<kernel>_{baseline,pass}
 #
 # Usage:
 #   bash scripts/cross_compile_rpi.sh               # all kernels, all models
@@ -28,13 +28,13 @@ OPT="$LLVM_BUILD/bin/opt"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-MICROBENCH="$REPO_ROOT/microbench_outputs"
-BENCHMARKS="$REPO_ROOT/benchmarks"
-BENCH_OUT="$REPO_ROOT/bench_outputs"
+MICROBENCH="$REPO_ROOT/case-study-kernel-outputs"
+BENCHMARKS="$REPO_ROOT/case-study-harnesses"
+BENCH_OUT="$REPO_ROOT/case-study-binaries"
 
 # ---- target definitions -------------------------------------------------------
 
-# Maps model name → Cortex CPU string for llc -mcpu
+# Maps model name -> Cortex CPU string for llc -mcpu
 mcpu_for() {
     case "$1" in
         rpi3b) echo "cortex-a53" ;;
@@ -78,7 +78,7 @@ check_tools() {
 # ---- compile helpers ----------------------------------------------------------
 
 # compile_variant <kernel> <model> <ll_file> <out_bin>
-# Compiles one .O2.ll → AArch64 object, cross-compiles C harness, links to static binary.
+# Compiles one .O2.ll -> AArch64 object, cross-compiles C harness, links to static binary.
 compile_variant() {
     local kernel=$1 model=$2 ll_file=$3 out_bin=$4
     local mcpu
@@ -88,10 +88,10 @@ compile_variant() {
     mkdir -p "$out_dir"
 
     local c_src="$BENCHMARKS/bench_${kernel}.c"
-    [ -f "$c_src" ]  || { echo "    SKIP — no harness: bench_${kernel}.c"; return; }
-    [ -f "$ll_file" ] || { echo "    SKIP — no IR: $(basename "$ll_file")"; return; }
+    [ -f "$c_src" ]  || { echo "    SKIP - no harness: bench_${kernel}.c"; return; }
+    [ -f "$ll_file" ] || { echo "    SKIP - no IR: $(basename "$ll_file")"; return; }
 
-    # MLIR kernel IR → AArch64 ELF object.
+    # MLIR kernel IR -> AArch64 ELF object.
     # -mtriple overrides any target triple baked into the .ll by the macOS opt run.
     "$LLC" \
         -mtriple=aarch64-linux-gnu \
@@ -100,7 +100,7 @@ compile_variant() {
         "$ll_file" \
         -o "${out_bin}.k.o"
 
-    # C harness → static AArch64 binary with musl libc bundled (no sysroot needed).
+    # C harness -> static AArch64 binary with musl libc bundled (no sysroot needed).
     zig cc \
         --target=aarch64-linux-musl \
         -static \
@@ -126,7 +126,7 @@ compile_kernel() {
     # vectorize_split: re-run opt targeting AArch64 directly so the cost model
     # naturally vectorizes with ldp/stp (VF=4, interleave=2). All three Pi CPUs
     # (A53, A72, A76) vectorize naturally when alias uncertainty is resolved.
-    # The macOS fvw4 IR is NOT used for Pi builds — it lacks interleaving and is
+    # The macOS fvw4 IR is NOT used for Pi builds - it lacks interleaving and is
     # suboptimal for ARM memory pipelines.
     if [ "$kernel" = "vectorize_split" ]; then
         local mcpu
@@ -186,5 +186,5 @@ done
 
 echo "Binaries in $BENCH_OUT/<kernel>/<model>/"
 echo ""
-echo "Next: edit scripts/rpi_config.sh with your Tailscale hostnames,"
+echo "Next: edit scripts/rpi_config.sh with your local hostnames or LAN IPs,"
 echo "      then run:  bash scripts/run_rpi_benchmarks.sh"

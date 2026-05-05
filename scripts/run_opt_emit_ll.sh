@@ -10,7 +10,7 @@ INPUT=$1
 OUTPUT=$2
 REMARKS=$3
 
-LLVM_BUILD="${LLVM_BUILD:-/Users/shravansheth/ShravsSSD/llvm-project/build}"
+LLVM_BUILD="${LLVM_BUILD:-/Users/shravansheth/ShravsSSD/llvm-project/build}"  # override with env var if needed
 
 OPT="$LLVM_BUILD/bin/opt"
 

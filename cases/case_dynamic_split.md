@@ -1,4 +1,4 @@
-# Case — Dynamically-split subview disjointness lost during lowering; LICM, GVN, and vectorization blocked
+# Case - Dynamically-split subview disjointness lost during lowering; LICM, GVN, and vectorization blocked
 
 ## Kernel
 `kernels/mlir/dynamic_split.mlir`
@@ -11,7 +11,7 @@ These subviews are **structurally disjoint at the MLIR level** by construction: 
 
 ## Key MLIR structural fact
 `memref.subview %A[0][%n][1]` and `memref.subview %A[%n][%hi_size][1]` tile the same base buffer end-to-end.
-MLIR guarantees they are non-overlapping as long as `n >= 1` — a typical pre-condition imposed by the caller (e.g., a tiling pass).
+MLIR guarantees they are non-overlapping as long as `n >= 1` - a typical pre-condition imposed by the caller (e.g., a tiling pass).
 
 ## Baseline lowering (no alias metadata)
 Artifacts:
@@ -28,12 +28,12 @@ Without knowing `n >= 1`, LLVM cannot prove `n + i ≠ 0` for all loop iteration
 so it conservatively treats the store as a potential clobber of the load.
 
 Observed behavior:
-- In `dynamic_split.O2.ll`, the invariant load `%12 = load float, ptr %1` **remains inside the loop** — it is **not hoisted** to the preheader.
+- In `dynamic_split.O2.ll`, the invariant load `%12 = load float, ptr %1` **remains inside the loop** - it is **not hoisted** to the preheader.
 - Remarks show `licm: LoadWithLoopInvariantAddressInvalidated` (×3 across pipeline runs).
-- Remarks show `gvn: LoadClobbered` (×2) — GVN also cannot eliminate the redundant load.
-- Remarks show `loop-vectorize: UnsafeDep` — vectorization is blocked by the unknown data dependence.
+- Remarks show `gvn: LoadClobbered` (×2) - GVN also cannot eliminate the redundant load.
+- Remarks show `loop-vectorize: UnsafeDep` - vectorization is blocked by the unknown data dependence.
 
-This is a **three-pronged miss**: LICM, GVN, and vectorization all fail due to the same root cause — missing alias disambiguation for dynamically-computed GEP offsets.
+This is a **three-pronged miss**: LICM, GVN, and vectorization all fail due to the same root cause - missing alias disambiguation for dynamically-computed GEP offsets.
 
 ## Root cause
 After lowering, the subview offset `n` becomes an `i64` function argument (`%5`). Both `lo` and `hi` accesses use the same base pointer (`ptr %1`). LLVM sees:
@@ -58,10 +58,10 @@ This encodes at the LLVM IR level what the MLIR structural split guarantees:
 > "No access through `hi` can alias any access through `lo`."
 
 Observed behavior after oracle:
-- Remarks: `licm: Hoisted` — LICM **successfully hoists** the invariant load.
+- Remarks: `licm: Hoisted` - LICM **successfully hoists** the invariant load.
 - The invariant load is folded away entirely by constant propagation (lo[0] holds the pre-stored value 1.0).
 - The loop body simplifies to `hi[i] = hi[i] + 1.0` (a simpler, inlinable expression).
-- Remarks: `loop-vectorize: VectorizationNotBeneficial` — the aliasing uncertainty is **resolved**; vectorization is now only blocked by cost model, not by an unknown data dependence.
+- Remarks: `loop-vectorize: VectorizationNotBeneficial` - the aliasing uncertainty is **resolved**; vectorization is now only blocked by cost model, not by an unknown data dependence.
 
 ## Comparison: what was blocked vs what is enabled
 | Optimization | Baseline              | Oracle                    |
@@ -73,6 +73,6 @@ Observed behavior after oracle:
 ## Conclusion
 This case demonstrates a **dynamic-offset disjointness gap**: when a buffer is split at a runtime index `%n`, MLIR structurally guarantees the two halves are non-overlapping, but LLVM sees only two GEP computations from the same base pointer with a runtime offset. Without an explicit lower bound on `%n`, all three optimization passes (LICM, GVN, vectorization) are blocked.
 
-The oracle shows that adding `!alias.scope` / `!noalias` metadata — encoding the structural MLIR disjointness guarantee at the LLVM IR level — fully resolves the aliasing uncertainty and enables the blocked optimizations.
+The oracle shows that adding `!alias.scope` / `!noalias` metadata - encoding the structural MLIR disjointness guarantee at the LLVM IR level - fully resolves the aliasing uncertainty and enables the blocked optimizations.
 
 This is the type of metadata our future MLIR-to-LLVM propagation pass would emit automatically for any pair of `memref.subview` operations that are provably disjoint at the MLIR structural level, even when their offsets are runtime values.

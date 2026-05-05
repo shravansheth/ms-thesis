@@ -1,4 +1,4 @@
-# Case — `memref.distinct_objects` alias information lost during lowering; LICM blocked on function arguments
+# Case - `memref.distinct_objects` alias information lost during lowering; LICM blocked on function arguments
 
 ## Kernels
 - Baseline: `kernels/mlir/distinct_args_hoist_base.mlir`
@@ -21,13 +21,13 @@ LLVM IR structure:
   (two sets of `ptr alloc, ptr aligned, i64 offset, i64 size, i64 stride`).
 - `B[0]` load  = `gep ptr %B_aligned, 0`
 - `A[i]` store = `gep ptr %A_aligned, i`
-- `%A_aligned` and `%B_aligned` are separate function parameters — LLVM must conservatively
+- `%A_aligned` and `%B_aligned` are separate function parameters - LLVM must conservatively
   assume they could point to overlapping memory (e.g., a caller passes the same buffer twice).
 
 Observed behavior:
 - In `distinct_args_hoist_base.O2.ll`, the load from `B[0]` **remains inside the loop**.
 - Remarks: `licm: LoadWithLoopInvariantAddressInvalidated` (×3).
-- Remarks: `gvn: LoadClobbered` (×1) — GVN also blocked.
+- Remarks: `gvn: LoadClobbered` (×1) - GVN also blocked.
 
 ## With `memref.distinct_objects` annotation (`distinct_args_hoist_distinct`)
 Artifacts:
@@ -51,7 +51,7 @@ The MLIR lowering correctly emits `@llvm.assume` with the `"separate_storage"` o
 which LLVM's alias analysis understands as "the two pointer arguments come from distinct allocations."
 
 Observed behavior:
-- Remarks: `licm: Hoisted` — **LICM successfully hoists** `B[0]` to the loop preheader.
+- Remarks: `licm: Hoisted` - **LICM successfully hoists** `B[0]` to the loop preheader.
 - The loop body no longer contains the redundant load.
 
 ## Root cause of the gap

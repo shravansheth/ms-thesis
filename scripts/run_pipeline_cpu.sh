@@ -6,7 +6,7 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
-LLVM_BUILD="${LLVM_BUILD:-/Users/shravansheth/ShravsSSD/llvm-project/build}"
+LLVM_BUILD="${LLVM_BUILD:-/Users/shravansheth/ShravsSSD/llvm-project/build}"  # override with env var if needed
 
 MLIR_OPT="$LLVM_BUILD/bin/mlir-opt"
 
@@ -21,7 +21,7 @@ BASENAME="$(basename "$PREFIX")"
 
 mkdir -p "$OUTDIR"
 
-# ---- MLIR → LLVM dialect ----
+# ---- MLIR -> LLVM dialect ----
 "$MLIR_OPT" "$INPUT" \
   -convert-scf-to-cf \
   -memref-expand \
@@ -37,7 +37,7 @@ mkdir -p "$OUTDIR"
   -reconcile-unrealized-casts \
   > "${PREFIX}.llvm_dialect.mlir"
 
-# ---- LLVM dialect → LLVM IR ----
+# ---- LLVM dialect -> LLVM IR ----
 "$MLIR_TRANSLATE" --mlir-to-llvmir \
   "${PREFIX}.llvm_dialect.mlir" \
   > "${PREFIX}.ll"

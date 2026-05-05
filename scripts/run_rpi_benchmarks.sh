@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Deploy and run alias-metadata benchmarks on Raspberry Pi devices via Tailscale SSH.
+# Deploy and run alias-metadata benchmarks on Raspberry Pi devices via
+# local-network SSH.
 #
 # Prerequisites:
 #   - SSH key auth set up for each Pi (ssh-copy-id pi@<host>)
-#   - scripts/rpi_config.sh filled in with correct Tailscale hostnames
-#   - Cross-compiled binaries in bench_outputs/<kernel>/<model>/
+#   - scripts/rpi_config.sh filled in with correct local hostnames or LAN IPs
+#   - Cross-compiled binaries in case-study-binaries/<kernel>/<model>/
 #     (run scripts/cross_compile_rpi.sh first)
 #
 # Usage:
@@ -16,7 +17,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-BENCH_OUT="$REPO_ROOT/bench_outputs"
+BENCH_OUT="$REPO_ROOT/case-study-binaries"
 
 source "$SCRIPT_DIR/rpi_config.sh"
 
@@ -69,7 +70,7 @@ check_reachable() {
     if ssh_run "$host" "true" 2>/dev/null; then
         echo "  $model ($host): reachable"
     else
-        echo "  $model ($host): UNREACHABLE — skipping"
+        echo "  $model ($host): UNREACHABLE - skipping"
         return 1
     fi
 }
@@ -83,7 +84,7 @@ deploy_kernel() {
     local pass_bin="$bin_dir/${kernel}_pass"
 
     if [ ! -f "$base_bin" ] || [ ! -f "$pass_bin" ]; then
-        echo "    SKIP $kernel — binaries missing (run cross_compile_rpi.sh first)"
+        echo "    SKIP $kernel - binaries missing (run cross_compile_rpi.sh first)"
         return
     fi
 
@@ -146,7 +147,7 @@ for model in "${TARGET_MODELS[@]}"; do
 done
 
 if [ ${#ACTIVE_MODELS[@]} -eq 0 ]; then
-    die "No Pis reachable. Check Tailscale and rpi_config.sh."
+    die "No Pis reachable. Check local-network SSH and rpi_config.sh."
 fi
 
 echo ""
@@ -154,7 +155,7 @@ echo ""
 for model in "${ACTIVE_MODELS[@]}"; do
     host=$(host_for "$model")
     cpu=$(cpu_desc_for "$model")
-    echo "=== $model — $cpu ($host) ==="
+    echo "=== $model - $cpu ($host) ==="
 
     # Deploy all kernels
     echo "  Deploying binaries..."

@@ -35,7 +35,7 @@ module {
   // Caller: partitions A into src and dst tiles using partition-by-endpoint.
   // src = A[tile*N .. (tile+1)*N - 1]
   // dst = A[(tile+1)*N .. (tile+2)*N - 1]
-  // dst.offset = src.offset + N = src.offset + src.size  → partition-by-endpoint
+  // dst.offset = src.offset + N = src.offset + src.size  -> partition-by-endpoint
   func.func @tiling_caller(%A: memref<4096xf32>, %tile: index, %N: index) {
     %c1 = arith.constant 1 : index
 
@@ -43,7 +43,7 @@ module {
     %src = memref.subview %A[%src_off][%N][1]
       : memref<4096xf32> to memref<?xf32, strided<[1], offset: ?>>
 
-    // dst.offset = src.offset + N  →  partition-by-endpoint
+    // dst.offset = src.offset + N  ->  partition-by-endpoint
     %dst_off = arith.addi %src_off, %N : index
     %dst = memref.subview %A[%dst_off][%N][1]
       : memref<4096xf32> to memref<?xf32, strided<[1], offset: ?>>

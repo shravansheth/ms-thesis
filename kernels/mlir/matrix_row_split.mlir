@@ -21,7 +21,7 @@ module {
       : memref<?x512xf32> to memref<?x512xf32, strided<[512, 1], offset: 0>>
 
     // bot: rows [m, 2m), all 512 columns.
-    // bot's row-offset (%m) == top's row-size (%m) → structurally disjoint.
+    // bot's row-offset (%m) == top's row-size (%m) -> structurally disjoint.
     // Flat offset of bot[0][0] = m * 512, which LLVM cannot prove non-zero.
     %bot = memref.subview %A[%m, 0][%m, 512][1, 1]
       : memref<?x512xf32> to memref<?x512xf32, strided<[512, 1], offset: ?>>

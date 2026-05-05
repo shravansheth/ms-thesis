@@ -3,7 +3,7 @@
 ## Project Structure
 
 The pass lives in `pass/` at the repo root. It is an **out-of-tree MLIR pass project**
-— it does not touch the LLVM/MLIR source tree and does not require rebuilding mlir-opt.
+- it does not touch the LLVM/MLIR source tree and does not require rebuilding mlir-opt.
 
 ```
 pass/
@@ -11,9 +11,11 @@ pass/
 ├── include/
 │   └── AliasMetaPropagation/
 │       ├── Passes.h                        # Public header: attr name constants + pass decls
-│       └── Passes.td                       # TableGen: defines MarkAliasGroups + LowerWithAliasMeta
+│       └── Passes.td                       # TableGen: defines MaterializePrefixSubviews,
+│                                           #            MarkAliasGroups, LowerWithAliasMeta
 ├── lib/
 │   ├── CMakeLists.txt                      # Links AliasMetaPropagation static library
+│   ├── MaterializePrefixSubviewsPass.cpp   # Pre-pass (ClangIR call-site normalization)
 │   ├── MarkAliasGroupsPass.cpp             # Pass 1 implementation
 │   └── LowerWithAliasMetaPass.cpp          # Pass 2 implementation
 ├── plugin/
@@ -21,7 +23,7 @@ pass/
 │   └── AliasMetaPlugin.cpp                 # Plugin entry point (mlirGetPassPluginInfo)
 ├── tools/
 │   ├── CMakeLists.txt
-│   └── alias-meta-opt.cpp                  # Standalone alias-meta-opt binary (alternative to plugin)
+│   └── alias-meta-opt.cpp                  # Standalone alias-meta-opt binary (all 3 passes)
 └── build/                                  # CMake build directory (gitignored)
     ├── bin/alias-meta-opt                  # Standalone binary
     └── lib/AliasMetaPropagationPlugin.dylib  # Plugin for mlir-opt
@@ -60,20 +62,28 @@ source (thousands of files) and is not needed. Our project builds in seconds.
 
 ## How to Run
 
-**Via standalone binary** (recommended — no ODR issues):
+**Via standalone binary** (recommended - no ODR issues):
 
 ```bash
+# Case-study kernels (pre-pass not needed):
 pass/build/bin/alias-meta-opt \
+  --mark-alias-groups \
+  --lower-with-alias-meta \
+  input.mlir -o output.mlir
+
+# ClangIR benchmarks (pre-pass needed):
+pass/build/bin/alias-meta-opt \
+  --materialize-prefix-subviews \
   --mark-alias-groups \
   --lower-with-alias-meta \
   input.mlir -o output.mlir
 ```
 
-Note: `alias-meta-opt` only has our two passes. Feed the output to `mlir-opt` for
+Note: `alias-meta-opt` only has our three passes. Feed the output to `mlir-opt` for
 the remaining standard lowering passes. Use `scripts/run_pipeline_cpu_with_meta.sh`
 which handles the full two-step pipeline automatically.
 
-**Via plugin** (do NOT use — crashes with ODR assertion failure on macOS):
+**Via plugin** (do NOT use - crashes with ODR assertion failure on macOS):
 
 The plugin (`AliasMetaPropagationPlugin.dylib`) loads into `mlir-opt` via
 `--load-pass-plugin` but crashes at runtime because inline MLIR functions
@@ -81,7 +91,7 @@ The plugin (`AliasMetaPropagationPlugin.dylib`) loads into `mlir-opt` via
 The `-flat_namespace -undefined suppress` linker option does not fully resolve this.
 The plugin is built but should not be used for execution.
 
-## Attribute Conventions (Pass 1 → Pass 2 Interface)
+## Attribute Conventions (Pass 1 -> Pass 2 Interface)
 
 Pass 1 (`MarkAliasGroups`) communicates with Pass 2 (`LowerWithAliasMeta`) via
 **discardable attributes** attached to IR ops. These require no custom dialect.
@@ -90,14 +100,13 @@ Pass 1 (`MarkAliasGroups`) communicates with Pass 2 (`LowerWithAliasMeta`) via
 |---|---|---|---|
 | `alias_meta.group_id` | `memref.load`, `memref.store` | `IntegerAttr` (i32) | Alias group number. Even = lo subview, odd = hi subview of the same pair. Pair N: lo=2N, hi=2N+1. |
 | `alias_meta.role` | `memref.load`, `memref.store` | `StringAttr` ("lo" or "hi") | Whether this op reads/writes the lo or hi region. |
-| `alias_meta.disjoint_args` | `func.call` | `ArrayAttr` of `[lo_idx, hi_idx]` pairs | Argument position pairs that are provably disjoint (for noinline callee case). |
 
 Pass 2 reads these attrs, emits the corresponding LLVM alias scope metadata, then
 removes the attrs so they don't appear in final output.
 
 ## What Each Pass Does (Current Implementation Status)
 
-### Pass 1: `MarkAliasGroups` — **COMPLETE**
+### Pass 1: `MarkAliasGroups` - **COMPLETE**
 
 Walks all `func.func` ops in the module. For each function:
 1. Collects `memref.subview` ops grouped by base memref SSA value
@@ -107,9 +116,9 @@ Walks all `func.func` ops in the module. For each function:
    - Form C: all compile-time constants satisfying hi_off == lo_off + lo_size
 3. Assigns group IDs (2N = lo, 2N+1 = hi) and walks def-use of each subview result
 4. Tags `memref.load`/`memref.store` with `alias_meta.group_id` + `alias_meta.role`
-5. For noinline callees: descends into callee body and tags corresponding arg's loads/stores directly
+5. For noinline callees: clones the callee (once per call site), redirects the call, then recursively calls `tagUsesOfValue` on the clone's matching `BlockArgument` - applying all the same chain-following rules inside the clone body
 
-### Pass 2: `LowerWithAliasMeta` — **COMPLETE**
+### Pass 2: `LowerWithAliasMeta` - **COMPLETE**
 
 Partial DialectConversion using `LLVMTypeConverter`. For each tagged `memref.load`/`memref.store`:
 1. Creates one `AliasScopeDomainAttr` and one `AliasScopeAttr` (lo scope) per disjoint pair
@@ -127,7 +136,7 @@ survive the standard conversion. See `docs/implementation-log.md` for full ratio
 Use the pipeline script (mirrors `run_pipeline_cpu.sh`):
 
 ```bash
-# Step 1: Our passes + standard lowering → .ll
+# Step 1: Our passes + standard lowering -> .ll
 bash scripts/run_pipeline_cpu_with_meta.sh kernels/mlir/<name>.mlir outputs/<name>/<name>.meta
 
 # Step 2: O2 optimization + remarks
@@ -153,7 +162,7 @@ All 6 kernels validated. Alias-related misses (`LoadWithLoopInvariantAddressInva
 | **Total** | **13** | **16** | **32** | **0** |
 
 †The lo[0] data load hoist is immediately folded by SCCP; hoist count stays flat.
-`vectorize_split` additionally resolves the `UnsafeDep` vectorization block — 3.76× on
+`vectorize_split` additionally resolves the `UnsafeDep` vectorization block - 3.76× on
 Apple M-series when compiled with `-force-vector-width=4`.
 
 See `docs/implementation-log.md` for full details on decisions, problems, and API notes.

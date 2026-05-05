@@ -1,4 +1,4 @@
-# Case: `adjacent_tiles` — Adjacent Tiling (Partition-by-Endpoint via Arithmetic)
+# Case: `adjacent_tiles` - Adjacent Tiling (Partition-by-Endpoint via Arithmetic)
 
 **Kernel**: `kernels/mlir/adjacent_tiles.mlir`
 **Optimization missed**: LICM (invariant `src[0]` load not hoisted) + GVN
@@ -17,7 +17,7 @@ and `src[j]` inside the loop and stores `src[j] + src[0]` into `dst[j]`.
 %src = memref.subview %A[%src_off][%N][1]
   : memref<4096xf32> to memref<?xf32, strided<[1], offset: ?>>
 
-%dst_off = arith.addi %src_off, %N : index    // ← dst.offset = src.offset + N
+%dst_off = arith.addi %src_off, %N : index    // <- dst.offset = src.offset + N
 %dst = memref.subview %A[%dst_off][%N][1]
   : memref<4096xf32> to memref<?xf32, strided<[1], offset: ?>>
 
@@ -48,22 +48,22 @@ define void @adjacent_tiles(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 
 
   ; loop over j = 0..N-1:
   %20 = gep ptr %19, i64 %13        ; src[0] pointer = base + tile*N
-  %21 = load float, ptr %20         ; ← invariant load, NOT hoisted
+  %21 = load float, ptr %20         ; <- invariant load, NOT hoisted
   %22 = add i64 %13, %16            ; src[j] = tile*N + j
   %24 = gep ptr %23, i64 %22
   %25 = load float, ptr %24         ; src[j] load
   %27 = add i64 %14, %16            ; dst[j] = (tile+1)*N + j
   %29 = gep ptr %28, i64 %27
-  store float %26, ptr %29          ; ← store to dst[j]
+  store float %26, ptr %29          ; <- store to dst[j]
 }
 ```
 
 LLVM sees loads from `(base + tile*N + 0)` and a store to `(base + tile*N + N + j)`.
-To prove non-aliasing, LLVM needs `N > 0`. It has no basis to assume this — `N` is a
+To prove non-aliasing, LLVM needs `N > 0`. It has no basis to assume this - `N` is a
 runtime argument and could be 0.
 
 **Surprising finding**: LLVM does NOT use the inner-loop exit condition `j < N` to derive
-`N > 0`. LICM reasons at the preheader level — before the loop is known to execute — so it
+`N > 0`. LICM reasons at the preheader level - before the loop is known to execute - so it
 cannot use the loop-entry condition to constrain `N`.
 
 ---
@@ -74,9 +74,9 @@ From `remarks.O2.yml`:
 
 | Pass | Miss Name | Description |
 |------|-----------|-------------|
-| licm | `LoadWithLoopInvariantAddressInvalidated` | `src[0]` load not hoisted — may alias `dst[j]` store |
-| licm | `LoadWithLoopInvariantAddressInvalidated` | Repeated — conservative alias for each invalidation check |
-| gvn  | `LoadClobbered` | `src[0]` reload not eliminated — same aliasing uncertainty |
+| licm | `LoadWithLoopInvariantAddressInvalidated` | `src[0]` load not hoisted - may alias `dst[j]` store |
+| licm | `LoadWithLoopInvariantAddressInvalidated` | Repeated - conservative alias for each invalidation check |
+| gvn  | `LoadClobbered` | `src[0]` reload not eliminated - same aliasing uncertainty |
 
 ---
 
@@ -89,8 +89,8 @@ Add `!alias.scope !2` to the `src[0]` and `src[j]` loads and `!noalias !2` to th
 non-overlapping partitions of the same buffer.
 
 ```llvm
-  %21 = load float, ptr %20, align 4, !alias.scope !2   ; src[0] — invariant
-  %25 = load float, ptr %24, align 4, !alias.scope !2   ; src[j] — variant
+  %21 = load float, ptr %20, align 4, !alias.scope !2   ; src[0] - invariant
+  %25 = load float, ptr %24, align 4, !alias.scope !2   ; src[j] - variant
   store float %26, ptr %29, align 4, !noalias !2         ; dst[j]
 
 ; Metadata:
@@ -109,14 +109,14 @@ redundant reload. The optimized loop body reduces to `dst[j] = src[j] + src[0]` 
 
 The pass recognises the partition-by-endpoint pattern even when the endpoint is derived
 via arithmetic:
-- `%src_off = arith.muli %tile, %N` → LLVM `mul i64 %tile, %N`
-- `%dst_off = arith.addi %src_off, %N` → LLVM `add i64 %src_off, %N`
+- `%src_off = arith.muli %tile, %N` -> LLVM `mul i64 %tile, %N`
+- `%dst_off = arith.addi %src_off, %N` -> LLVM `add i64 %src_off, %N`
 
 The SSA chain `dst_off = src_off + N` and `src.size = N` establishes:
-`dst_off == src_off + src_size` → partition-by-endpoint → disjoint.
+`dst_off == src_off + src_size` -> partition-by-endpoint -> disjoint.
 
 No runtime bounds on `N` are needed. In any well-defined MLIR program where the loop body
-executes (`j < N` is true), `N >= 1` is implied — but the pass doesn't rely on this. The
+executes (`j < N` is true), `N >= 1` is implied - but the pass doesn't rely on this. The
 structural proof is sufficient: any overlap between `src` and `dst` accesses implies UB
 in the original MLIR program.
 
@@ -126,7 +126,7 @@ in the original MLIR program.
 
 The pass has concrete, inspectable structural evidence at the MLIR level:
 1. Both subviews are derived from the same base memref `%A`.
-2. `dst.offset` is the SSA result of `addi(src_offset, src_size)` — partition-by-endpoint.
+2. `dst.offset` is the SSA result of `addi(src_offset, src_size)` - partition-by-endpoint.
 3. The arithmetic chain (`muli` + `addi`) is expressible in LLVM IR terms and can be
    tracked by the pass during lowering.
 

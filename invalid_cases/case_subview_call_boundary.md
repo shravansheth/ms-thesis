@@ -1,4 +1,4 @@
-# Case — Typed subview offset lost at call boundary; callee cannot prove disjointness
+# Case - Typed subview offset lost at call boundary; callee cannot prove disjointness
 
 ## Kernel
 `kernels/mlir/subview_call_boundary.mlir`
@@ -36,8 +36,8 @@ It cannot know `%dst_ptr == %src_ptr` (same allocation) OR infer the static offs
 Hence it cannot rule out aliasing.
 
 Observed behavior:
-- Remarks: `licm: LoadWithLoopInvariantAddressInvalidated` (×3) — LLVM cannot hoist `src[0]`.
-- Remarks: `gvn: LoadClobbered` (×1) — GVN also blocked.
+- Remarks: `licm: LoadWithLoopInvariantAddressInvalidated` (×3) - LLVM cannot hoist `src[0]`.
+- Remarks: `gvn: LoadClobbered` (×1) - GVN also blocked.
 
 ## Key difference from the `subview_noalias` case
 In `subview_noalias`, the two views come from **different** named subviews of the same allocation,
@@ -51,7 +51,7 @@ LLVM sees no relationship between `%src_ptr` and `%dst_ptr`.
 ## The mechanism of information loss
 | Layer              | What is known                                          |
 |:-------------------|:-------------------------------------------------------|
-| MLIR type system   | `memref<512xf32, strided<[1], offset: 512>>` — 512-float offset from base |
+| MLIR type system   | `memref<512xf32, strided<[1], offset: 512>>` - 512-float offset from base |
 | MLIR lowering      | Struct: `{ ptr alloc, ptr aligned, i64 512, i64 512, i64 1 }` |
 | LLVM function ABI  | Five separate `i64`/`ptr` arguments; offset = `i64 512` field |
 | LLVM AA inside @kernel | Two `ptr` arguments with no provable relationship    |
@@ -68,7 +68,7 @@ explicitly:
 ; recompute dst_ptr from src_ptr using the known offset:
 %dst_recomputed = getelementptr float, ptr %src_ptr, i64 512
 ; Then all dst stores: gep %dst_recomputed, i = src_ptr + 512 + i
-; Now LLVM can prove: load (src_ptr + 0) vs store (src_ptr + 512 + i) — offset 512+i ≠ 0
+; Now LLVM can prove: load (src_ptr + 0) vs store (src_ptr + 512 + i) - offset 512+i ≠ 0
 ```
 Or alternatively, add `!alias.scope` / `!noalias` metadata on the src loads and dst stores,
 following the same pattern as the `dynamic_split` oracle.

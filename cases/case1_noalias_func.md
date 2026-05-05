@@ -1,4 +1,4 @@
-# Case 3 — Caller-known disjoint subviews are lost across a noinline boundary; callee misses LICM/GVN
+# Case 3 - Caller-known disjoint subviews are lost across a noinline boundary; callee misses LICM/GVN
 
 ## Kernel
 `kernels/mlir/subview_noalias.mlir`
@@ -31,11 +31,11 @@ Artifacts:
 - `outputs/subview_noalias/subview_noalias_dup.O2.ll`
 
 Oracle transformation:
-1. Clone the callee: `@kernel` → `@kernel.noalias`.
+1. Clone the callee: `@kernel` -> `@kernel.noalias`.
 2. Restrict the specialized clone to call sites where we can prove the arguments come from disjoint subviews (here, `slice0` and `slice1` are non-overlapping ranges of `A`).
 3. In `@kernel.noalias`, attach disambiguation that LLVM understands, either:
    - argument-level `noalias` on the specialized function (when applicable)
-4. Rewrite the call site: `call @kernel(p, q)` → `call @kernel.noalias(p, q)` only when the proof holds.
+4. Rewrite the call site: `call @kernel(p, q)` -> `call @kernel.noalias(p, q)` only when the proof holds.
 
 Observed behavior after specialization:
 - In the manual oracle O2 output, the invariant load from `p[0]` is now hoisted, because LLVM is allowed to assume `p`-accesses do not alias `q`-accesses for this specialized version.

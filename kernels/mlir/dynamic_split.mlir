@@ -8,15 +8,15 @@ module {
   //
   // After lowering to LLVM IR:
   //   - Both subviews derive from the same base pointer.
-  //   - lo[0] → load from (base + 0)
-  //   - hi[i] → store to  (base + n + i)
+  //   - lo[0] -> load from (base + 0)
+  //   - hi[i] -> store to  (base + n + i)
   //
   // LLVM cannot prove non-aliasing without knowing n >= 1.
   // MLIR knows this structurally: the subview construction guarantees disjointness
   // as long as n > 0 (a typical precondition from the caller / tiling pass).
   //
   // Expected: LICM misses hoisting the load of lo[0] out of the loop.
-  // Oracle:   add @llvm.assume(n >= 1) before the loop → LICM hoists.
+  // Oracle:   add @llvm.assume(n >= 1) before the loop -> LICM hoists.
   func.func @dynamic_split(%A: memref<2048xf32>, %n: index) {
     %c0    = arith.constant 0 : index
     %c1    = arith.constant 1 : index

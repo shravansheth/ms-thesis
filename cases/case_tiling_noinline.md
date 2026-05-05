@@ -1,4 +1,4 @@
-# Case: `tiling_noinline` — Partition-by-Endpoint Tiling + Noinline Callee
+# Case: `tiling_noinline` - Partition-by-Endpoint Tiling + Noinline Callee
 
 **Kernel**: `kernels/mlir/tiling_noinline.mlir`
 **Optimization missed**: LICM (invariant `src[0]` load not hoisted) + GVN in noinline callee
@@ -16,7 +16,7 @@ func.func @tile_stencil(%src: memref<?xf32, strided<[1], offset: ?>>,
                         %dst: memref<?xf32, strided<[1], offset: ?>>,
                         %N: index) attributes {no_inline} {
   scf.for %j = %c0 to %N step %c1 {
-    %inv = memref.load %src[%c0]   // invariant — LLVM cannot hoist
+    %inv = memref.load %src[%c0]   // invariant - LLVM cannot hoist
     %x   = memref.load %src[%j]
     memref.store (x + inv), %dst[%j]
   }
@@ -35,8 +35,8 @@ func.func @tiling_caller(%A: memref<4096xf32>, %tile: index, %N: index) {
 ```
 
 This case combines two structural patterns:
-1. **Partition-by-endpoint** (`dynamic_split` / `adjacent_tiles`): `dst.offset = src.offset + src.size` — provable disjointness at the MLIR call site in `tiling_caller`.
-2. **Noinline callee boundary** (`subview_noalias`): The disjointness proof is lost when the callee receives raw `ptr` arguments — LLVM sees nothing about the relationship between them.
+1. **Partition-by-endpoint** (`dynamic_split` / `adjacent_tiles`): `dst.offset = src.offset + src.size` - provable disjointness at the MLIR call site in `tiling_caller`.
+2. **Noinline callee boundary** (`subview_noalias`): The disjointness proof is lost when the callee receives raw `ptr` arguments - LLVM sees nothing about the relationship between them.
 
 This is representative of real tiling workloads where a stencil kernel is abstracted as a
 library function called with adjacent tile arguments.
@@ -52,7 +52,7 @@ The generated `@tile_stencil` receives 11 parameters: two full 5-tuple memref de
 define void @tile_stencil(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4,
                           ptr %5, ptr %6, i64 %7, i64 %8, i64 %9, i64 %10) {
   ; ...loop over j = 0..N-1:
-  ; src[0]: base + src_offset + 0 — invariant, NOT hoisted
+  ; src[0]: base + src_offset + 0 - invariant, NOT hoisted
   %28 = getelementptr float, ptr %26, i64 %27   ; src_aligned + src_offset
   %30 = load float, ptr %29                      ; src[0]
   ; src[j]: base + src_offset + j
@@ -64,7 +64,7 @@ define void @tile_stencil(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4,
 
 **Key**: Inside `@tile_stencil`, LLVM sees `ptr %1` (src aligned) and `ptr %6` (dst aligned)
 as two arbitrary pointer arguments. There is no evidence that the regions they point into
-are disjoint — the caller's structural knowledge that `dst_off = src_off + N` is carried
+are disjoint - the caller's structural knowledge that `dst_off = src_off + N` is carried
 in `i64` struct fields, not in any alias constraint on the pointers themselves.
 
 **Structural distinction from `subview_noalias`**: In `subview_noalias`, the disjointness is
@@ -99,8 +99,8 @@ Add `!alias.scope !2` to the `src[0]` and `src[j]` loads and `!noalias !2` to th
 2. Propagates the disjointness as alias-scope metadata into the callee body.
 
 ```llvm
-  %30 = load float, ptr %29, align 4, !alias.scope !2   ; src[0] — invariant
-  %35 = load float, ptr %34, align 4, !alias.scope !2   ; src[j] — variant
+  %30 = load float, ptr %29, align 4, !alias.scope !2   ; src[0] - invariant
+  %35 = load float, ptr %34, align 4, !alias.scope !2   ; src[j] - variant
   store float %36, ptr %40, align 4, !noalias !2         ; dst[j]
 
 !1 = distinct !{!1, !"tiling_noinline:src_domain"}
@@ -109,16 +109,16 @@ Add `!alias.scope !2` to the `src[0]` and `src[j]` loads and `!noalias !2` to th
 ```
 
 **Result** (from `oracle.O2.yml`):
-- 3× LICM `Hoisted` in `tile_stencil` (GEP, load — the invariant `src[0]` load is hoisted)
+- 3× LICM `Hoisted` in `tile_stencil` (GEP, load - the invariant `src[0]` load is hoisted)
 - Zero `LoadWithLoopInvariantAddressInvalidated` misses
-- `NeverInline` — function remains noinline throughout
+- `NeverInline` - function remains noinline throughout
 - Only misses: `VectorizationNotBeneficial` + `InterleavingNotBeneficial` (cost-model)
 
 Optimized `@tile_stencil`:
 ```llvm
 .lr.ph:                              ; loop preheader
   %13 = gep float, ptr %1, i64 %2   ; src base ptr
-  %14 = load float, ptr %13, !alias.scope !1  ; ← src[0] hoisted here
+  %14 = load float, ptr %13, !alias.scope !1  ; <- src[0] hoisted here
   %15 = gep float, ptr %6, i64 %7   ; dst base ptr
 
 16:                                  ; inner loop
@@ -135,9 +135,9 @@ Optimized `@tile_stencil`:
 
 This case requires the pass to work across two layers simultaneously:
 
-**Layer 1 (Caller — `tiling_caller`)**: Recognise the partition-by-endpoint pattern.
+**Layer 1 (Caller - `tiling_caller`)**: Recognise the partition-by-endpoint pattern.
 - Track `%src_off = muli(%tile, %N)` and `%dst_off = addi(%src_off, %N)`.
-- Establish: `dst_off = src_off + N` and `src.size = N` → `dst_off == src_off + src.size`.
+- Establish: `dst_off = src_off + N` and `src.size = N` -> `dst_off == src_off + src.size`.
 
 **Layer 2 (Call site)**: Propagate the structural proof across the function boundary.
 - At the `func.call @tile_stencil(%src, %dst, %N)` site, the pass knows `%src` and `%dst`
@@ -153,7 +153,7 @@ This case requires the pass to work across two layers simultaneously:
 |--------|-------------------|-------------------|
 | Disjointness proof | Static MLIR types (`offset: 0`, `offset: 512`) | Runtime arithmetic chain (`dst_off = src_off + N`) |
 | Pattern | Explicit separate subregions | Partition-by-endpoint (same N) |
-| Arithmetic required | None — types encode the offsets | Track `muli`/`addi` SSA chain |
+| Arithmetic required | None - types encode the offsets | Track `muli`/`addi` SSA chain |
 | Fix mechanism | Same: `!alias.scope`/`!noalias` or `noalias` param |
 | Representative of | Static kernel specialization | Dynamic tiling / streaming access patterns |
 
@@ -164,7 +164,7 @@ This case requires the pass to work across two layers simultaneously:
 1. The pass has concrete structural evidence at the MLIR call site: `dst_off` is expressible
    as `src_off + N` via traceable SSA (`muli`, `addi`), and `src.size = N`.
 2. The partition-by-endpoint proof is sound: in any execution where the callee's loop runs
-   (j < N), `N >= 1` is implied — but the pass doesn't need this; structural SSA identity suffices.
+   (j < N), `N >= 1` is implied - but the pass doesn't need this; structural SSA identity suffices.
 3. The noinline callee is a common real-world pattern (library kernels, stencil abstractions).
 4. The `!alias.scope`/`!noalias` mechanism is semantically correct for subregions of the
    same allocation and produces the correct optimization.

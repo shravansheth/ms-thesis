@@ -3,8 +3,8 @@
 #
 # Verifies that the pass-compiled kernels produce identical numeric output
 # to the baseline-compiled kernels. For each case study kernel:
-#   1. Compile C test harness with baseline .O2.ll  → test_baseline_<kernel>
-#   2. Compile C test harness with pass .meta.O2.ll → test_pass_<kernel>
+#   1. Compile C test harness with baseline .O2.ll  -> test_baseline_<kernel>
+#   2. Compile C test harness with pass .meta.O2.ll -> test_pass_<kernel>
 #   3. Run both, compare stdout checksums.
 #   4. Report PASS or FAIL.
 #
@@ -23,7 +23,7 @@ LLC="${LLC:-/Users/shravansheth/ShravsSSD/llvm-project/build/bin/llc}"
 mkdir -p "$BIN"
 
 CC="${CC:-clang}"
-CFLAGS="-O0"   # No optimisation on the test harness itself — only the kernel IR is pre-optimised
+CFLAGS="-O0"   # No optimisation on the test harness itself - only the kernel IR is pre-optimised
 
 # Verify llc exists
 if [ ! -x "$LLC" ]; then
@@ -45,7 +45,7 @@ compile() {
     local out="$5"
     local obj="${out}.o"
 
-    # Use llc to compile .ll → .o (handles LLVM 22 IR syntax that system clang may not understand)
+    # Use llc to compile .ll -> .o (handles LLVM 22 IR syntax that system clang may not understand)
     # Then link .o + C harness with system clang
     if ! "$LLC" "$src_ll" -filetype=obj -o "$obj" 2>/dev/null; then
         echo "  [LLC FAIL] $name ($variant)"
@@ -130,7 +130,7 @@ check_noalias() {
         echo "FAIL (non-zero exit: base=$rc_base pass=$rc_pass)"
         FAIL=$((FAIL + 1))
     elif [ "$out_base" = "$out_pass" ]; then
-        echo "PASS  (run-without-fault x100; no numeric comparison — see test comment)"
+        echo "PASS  (run-without-fault x100; no numeric comparison - see test comment)"
         PASS=$((PASS + 1))
     else
         echo "FAIL (output mismatch)"
@@ -142,7 +142,7 @@ check_noalias() {
 
 # ── main ───────────────────────────────────────────────────────────────────
 
-echo "=== Alias Metadata Pass — Correctness Tests ==="
+echo "=== Alias Metadata Pass - Correctness Tests ==="
 echo "Compiler: $($CC --version | head -1)"
 echo ""
 echo "Each kernel is compiled twice: once with baseline O2 IR, once with"
@@ -159,9 +159,9 @@ check_noalias
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 if [ $FAIL -eq 0 ]; then
-    echo "ALL PASS — pass produces numerically identical output to baseline."
+    echo "ALL PASS - pass produces numerically identical output to baseline."
     exit 0
 else
-    echo "FAILURES DETECTED — alias metadata may be incorrect."
+    echo "FAILURES DETECTED - alias metadata may be incorrect."
     exit 1
 fi

@@ -9,7 +9,7 @@ module {
   // The first store is kept alive because the load from B[i] could be observing A[i].
   //
   // Expected: DSE misses the elimination of the "init" store to A[i].
-  // Oracle:   add memref.distinct_objects (or noalias/separate_storage in LLVM IR) → DSE fires.
+  // Oracle:   add memref.distinct_objects (or noalias/separate_storage in LLVM IR) -> DSE fires.
   func.func @dse_blocked_alias(%A: memref<512xf32>, %B: memref<512xf32>) {
     %c0   = arith.constant 0 : index
     %c1   = arith.constant 1 : index

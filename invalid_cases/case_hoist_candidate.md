@@ -1,4 +1,4 @@
-# Case  — Loop-invariant load hoisting blocked by alias uncertainty
+# Case  - Loop-invariant load hoisting blocked by alias uncertainty
 # INVALIDATED: Invalidated due to version mismatch. Issue works in LLVM 22.0.0
 ## Kernel
 `kernels/mlir/hoist_candidate.mlir`

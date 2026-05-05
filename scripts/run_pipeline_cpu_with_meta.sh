@@ -22,7 +22,9 @@ PREFIX=$2
 
 mkdir -p "$(dirname "$PREFIX")"
 
-# Step 1: our two passes (mark-alias-groups + lower-with-alias-meta)
+# Step 1: alias-meta-opt passes
+# For ClangIR-lowered benchmarks add --materialize-prefix-subviews as the first flag.
+# Case-study kernels (hand-written SCF) do not need it.
 "$ALIAS_META_OPT" \
   --mark-alias-groups \
   --lower-with-alias-meta \

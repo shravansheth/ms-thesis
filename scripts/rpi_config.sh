@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Tailscale hostnames and SSH config for Raspberry Pi benchmarks.
+# Local-network hostnames/IPs and SSH config for Raspberry Pi benchmarks.
+# If local hostnames like "rpi3b" do not resolve on your network, use each Pi's
+# LAN IP address instead, e.g. RPI3B_HOST="192.168.1.23".
 
-RPI3B_HOST="rpi3b"      # Tailscale hostname or IP — Cortex-A53, in-order
-RPI4B_HOST="rpi4b"      # Tailscale hostname or IP — Cortex-A72, light OOO
-RPI5_HOST="rpi5"        # Tailscale hostname or IP — Cortex-A76, deep OOO
+RPI3B_HOST="rpi3b"      # local hostname or LAN IP - Cortex-A53, in-order
+RPI4B_HOST="rpi4b"      # local hostname or LAN IP - Cortex-A72, light OOO
+RPI5_HOST="rpi5"        # local hostname or LAN IP - Cortex-A76, deep OOO
 
 RPI_USER="shrav"           # SSH username on all Pis 
 

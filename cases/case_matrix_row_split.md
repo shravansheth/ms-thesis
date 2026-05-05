@@ -1,4 +1,4 @@
-# Case: `matrix_row_split` — 2D Matrix Split on Dynamic Row Boundary
+# Case: `matrix_row_split` - 2D Matrix Split on Dynamic Row Boundary
 
 **Kernel**: `kernels/mlir/matrix_row_split.mlir`
 **Optimization missed**: LICM (invariant `top[0][0]` load not hoisted from nested loop)
@@ -38,7 +38,7 @@ without knowing `m >= 1`.
 
 **Distinction from 1D cases**: The 2D row-stride multiplication (`i64 * 512`) creates a
 compound GEP expression. LLVM's arithmetic reasoning must deal with a product `m*512`
-rather than a simple offset `n` — making this harder to reason about than the 1D cases
+rather than a simple offset `n` - making this harder to reason about than the 1D cases
 and more representative of real matrix-tiling workloads.
 
 ---
@@ -55,7 +55,7 @@ pointer arithmetic:
 ; bot[i][j] = base + (m+i)*512 + j
 
 ; inner loop block 25 (before oracle):
-%28 = load float, ptr %27, align 4          ; top[0][0] — NOT hoisted
+%28 = load float, ptr %27, align 4          ; top[0][0] - NOT hoisted
 %33 = load float, ptr %32, align 4          ; top[i][j]
 store float %34, ptr %39, align 4           ; bot[i][j]
 
@@ -78,7 +78,7 @@ From `remarks.O2.yml`:
 
 | Pass | Miss Name | Description |
 |------|-----------|-------------|
-| licm | `LoadWithLoopInvariantAddressInvalidated` | `top[0][0]` load not hoisted — inner loop |
+| licm | `LoadWithLoopInvariantAddressInvalidated` | `top[0][0]` load not hoisted - inner loop |
 | licm | `LoadWithLoopInvariantAddressInvalidated` | Same check repeated for outer loop preheader |
 | licm | `LoadWithLoopInvariantAddressInvalidated` | Third repetition (multiple LICM passes) |
 
@@ -92,8 +92,8 @@ Add `!alias.scope !2` to both `top` loads (invariant `top[0][0]` and variant `to
 and `!noalias !2` to the `bot[i][j]` store:
 
 ```llvm
-  %28 = load float, ptr %27, align 4, !alias.scope !2   ; top[0][0] — invariant
-  %33 = load float, ptr %32, align 4, !alias.scope !2   ; top[i][j] — variant
+  %28 = load float, ptr %27, align 4, !alias.scope !2   ; top[0][0] - invariant
+  %33 = load float, ptr %32, align 4, !alias.scope !2   ; top[i][j] - variant
   store float %34, ptr %39, align 4, !noalias !2         ; bot[i][j]
 
 ; Metadata:
@@ -103,7 +103,7 @@ and `!noalias !2` to the `bot[i][j]` store:
 ```
 
 **Result** (from `oracle.O2.yml`):
-- 5× LICM `Hoisted` — invariant `top[0][0]` load hoisted to outer-loop preheader
+- 5× LICM `Hoisted` - invariant `top[0][0]` load hoisted to outer-loop preheader
 - `top[0][0]` constant-propagated to `1.0` (known from the seed store)
 - No `LoadWithLoopInvariantAddressInvalidated` misses
 - Only misses: `VectorizationNotBeneficial` + `InterleavingNotBeneficial` (cost-model only)
@@ -123,7 +123,7 @@ For a 2D memref subview, the pass must understand the flat offset computation:
 - `top` maps row `r`, col `c` to flat offset `r * stride[0] + c * stride[1] + base_offset`
 - `bot` maps row `r`, col `c` to flat offset `(m + r) * stride[0] + c * stride[1] + ?`
 
-The key structural relationship: `bot.row_offset (%m)` equals `top.row_size (%m)` — the
+The key structural relationship: `bot.row_offset (%m)` equals `top.row_size (%m)` - the
 rows of `top` and `bot` tile the original matrix without overlap. This is the 2D
 analogue of the 1D partition-by-endpoint pattern.
 
@@ -136,11 +136,11 @@ partition structure. Alternatively, the analysis can be done pre-lowering at the
 
 ## Why Valid
 
-1. The two subviews tile the matrix without overlap — provable from MLIR types and
+1. The two subviews tile the matrix without overlap - provable from MLIR types and
    operation arguments before any lowering.
-2. The 2D row-stride multiplication is the canonical representation of matrix tiling —
+2. The 2D row-stride multiplication is the canonical representation of matrix tiling -
    a common pattern in BLAS, ML kernels, and tensor computations.
 3. LLVM cannot recover the structural proof after lowering to flat GEPs with dynamic
-   multiplications — the barrier is the same as in the 1D case but with an extra level
+   multiplications - the barrier is the same as in the 1D case but with an extra level
    of arithmetic complexity.
 4. The `!alias.scope`/`!noalias` oracle mechanism works identically for 2D as for 1D.
