@@ -1,0 +1,26 @@
+digraph "CFG for 'run_bicg_packed' function" {
+	label="CFG for 'run_bicg_packed' function";
+
+	Node0x10cfe27b0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{22:\l|  %23 = sext i32 %20 to i64\l  %24 = icmp sgt i32 %20, 0\l  br i1 %24, label %.lr.ph.i, label %.preheader.i\l|{<s0>T|<s1>F}}"];
+	Node0x10cfe27b0:s0 -> Node0x10cfe4160;
+	Node0x10cfe27b0:s1 -> Node0x10cfe43d0;
+	Node0x10cfe4160 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{.lr.ph.i:\l|  %25 = getelementptr float, ptr %16, i64 %17\l  %26 = zext nneg i32 %20 to i64\l  %27 = shl nuw nsw i64 %26, 2\l  tail call void @llvm.memset.p0.i64(ptr align 4 %25, i8 0, i64 %27, i1 false)\l  br label %.preheader.i\l}"];
+	Node0x10cfe4160 -> Node0x10cfe43d0;
+	Node0x10cfe43d0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{.preheader.i:\l|  %28 = icmp sgt i32 %21, 0\l  br i1 %28, label %.lr.ph156.i, label %kernel_bicg.exit\l|{<s0>T|<s1>F}}"];
+	Node0x10cfe43d0:s0 -> Node0x10cfe46a0;
+	Node0x10cfe43d0:s1 -> Node0x10cfe4740;
+	Node0x10cfe46a0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{.lr.ph156.i:\l|  %29 = getelementptr float, ptr %16, i64 %17\l  %30 = getelementptr float, ptr %29, i64 %23\l  %31 = getelementptr float, ptr %11, i64 %12\l  %32 = getelementptr float, ptr %6, i64 %7\l  %wide.trip.count163.i = zext nneg i32 %21 to i64\l  %wide.trip.count.i = zext nneg i32 %20 to i64\l  br label %33\l}"];
+	Node0x10cfe46a0 -> Node0x10cfe4910;
+	Node0x10cfe4910 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{33:\l|  %indvars.iv160.i = phi i64 [ 0, %.lr.ph156.i ], [ %indvars.iv.next161.i,\l... %._crit_edge.i ]\l  %34 = getelementptr inbounds nuw float, ptr %30, i64 %indvars.iv160.i\l  store float 0.000000e+00, ptr %34, align 4\l  br i1 %24, label %.lr.ph154.i, label %._crit_edge.i\l|{<s0>T|<s1>F}}"];
+	Node0x10cfe4910:s0 -> Node0x10cfe4ef0;
+	Node0x10cfe4910:s1 -> Node0x10cfe49b0;
+	Node0x10cfe4ef0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph154.i:\l|  %35 = getelementptr inbounds nuw float, ptr %31, i64 %indvars.iv160.i\l  %36 = getelementptr float, ptr %1, i64 %indvars.iv160.i\l  br label %37\l}"];
+	Node0x10cfe4ef0 -> Node0x10cfe5050;
+	Node0x10cfe5050 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{37:\l|  %indvars.iv.i = phi i64 [ 0, %.lr.ph154.i ], [ %indvars.iv.next.i, %37 ]\l  %38 = getelementptr inbounds nuw float, ptr %29, i64 %indvars.iv.i\l  %39 = load float, ptr %38, align 4\l  %40 = load float, ptr %35, align 4\l  %41 = getelementptr float, ptr %36, i64 %indvars.iv.i\l  %42 = load float, ptr %41, align 4\l  %43 = fmul float %40, %42\l  %44 = fadd float %39, %43\l  store float %44, ptr %38, align 4\l  %45 = load float, ptr %34, align 4\l  %46 = load float, ptr %41, align 4\l  %47 = getelementptr inbounds nuw float, ptr %32, i64 %indvars.iv.i\l  %48 = load float, ptr %47, align 4\l  %49 = fmul float %46, %48\l  %50 = fadd float %45, %49\l  store float %50, ptr %34, align 4\l  %indvars.iv.next.i = add nuw nsw i64 %indvars.iv.i, 1\l  %exitcond.not.i = icmp eq i64 %indvars.iv.next.i, %wide.trip.count.i\l  br i1 %exitcond.not.i, label %._crit_edge.i, label %37\l|{<s0>T|<s1>F}}"];
+	Node0x10cfe5050:s0 -> Node0x10cfe49b0;
+	Node0x10cfe5050:s1 -> Node0x10cfe5050;
+	Node0x10cfe49b0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{._crit_edge.i:\l|  %indvars.iv.next161.i = add nuw nsw i64 %indvars.iv160.i, 1\l  %exitcond164.not.i = icmp eq i64 %indvars.iv.next161.i, %wide.trip.count163.i\l  br i1 %exitcond164.not.i, label %kernel_bicg.exit, label %33\l|{<s0>T|<s1>F}}"];
+	Node0x10cfe49b0:s0 -> Node0x10cfe4740;
+	Node0x10cfe49b0:s1 -> Node0x10cfe4910;
+	Node0x10cfe4740 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{kernel_bicg.exit:\l|  ret void\l}"];
+}

@@ -1,0 +1,15 @@
+rpi3b polybench_atax baseline=228471.82 pass=182446.17 speedup=1.25 checksum_baseline=n/a checksum_pass=n/a
+rpi3b polybench_bicg baseline=292719.45 pass=292742.68 speedup=1.00 checksum_baseline=n/a checksum_pass=n/a
+rpi3b imex_softmax baseline=3980783.49 pass=3982704.95 speedup=1.00 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi3b polybench_mvt baseline=230562.14 pass=230600.52 speedup=1.00 checksum_baseline=n/a checksum_pass=n/a
+rpi3b iree_bias_add baseline=270294890.50 pass=275512395.75 speedup=0.98 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+rpi4b polybench_atax baseline=60907.02 pass=41420.93 speedup=1.47 checksum_baseline=n/a checksum_pass=n/a
+rpi4b polybench_bicg baseline=106156.31 pass=50656.58 speedup=2.10 checksum_baseline=n/a checksum_pass=n/a
+rpi4b imex_softmax baseline=908696.70 pass=809863.65 speedup=1.12 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi4b polybench_mvt baseline=62333.67 pass=62271.09 speedup=1.00 checksum_baseline=n/a checksum_pass=n/a
+rpi4b iree_bias_add baseline=75479627.75 pass=74380836.10 speedup=1.01 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+rpi5 polybench_atax baseline=27992.51 pass=18417.94 speedup=1.52 checksum_baseline=n/a checksum_pass=n/a
+rpi5 polybench_bicg baseline=47176.03 pass=22048.62 speedup=2.14 checksum_baseline=n/a checksum_pass=n/a
+rpi5 imex_softmax baseline=227578.26 pass=199853.15 speedup=1.14 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi5 polybench_mvt baseline=28302.95 pass=28302.64 speedup=1.00 checksum_baseline=n/a checksum_pass=n/a
+rpi5 iree_bias_add baseline=32394813.85 pass=32999346.30 speedup=0.98 checksum_baseline=17825736.000000 checksum_pass=17825736.000000

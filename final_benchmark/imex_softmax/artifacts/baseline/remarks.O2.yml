@@ -1,0 +1,87 @@
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          'hoisting '
+  - Inst:            shl
+...
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Passed
+Pass:            licm
+Name:            Hoisted
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          'hoisting '
+  - Inst:            getelementptr
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Missed
+Pass:            gvn
+Name:            LoadClobbered
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          'load of type '
+  - Type:            float
+  - String:          ' not eliminated'
+  - String:          ' because it is clobbered by '
+  - ClobberedBy:     store
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...
+--- !Analysis
+Pass:            loop-vectorize
+Name:            UnsafeDep
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          'loop not vectorized: '
+  - String:          'unsafe dependent memory operations in loop. Use #pragma clang loop distribute(enable) to allow loop distribution to attempt to isolate the offending operations into a separate loop'
+  - String:          "\nUnknown data dependence."
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            MissedDetails
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          loop not vectorized
+...
+--- !Missed
+Pass:            slp-vectorizer
+Name:            NotPossible
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          'Cannot SLP vectorize list: vectorization was impossible'
+  - String:          ' with available vectorization factors'
+...
+--- !Missed
+Pass:            licm
+Name:            LoadWithLoopInvariantAddressInvalidated
+Function:        imex_softmax_scale_packed
+Args:
+  - String:          failed to move load with loop-invariant address because the loop may invalidate its value
+...

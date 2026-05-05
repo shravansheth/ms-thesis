@@ -33,7 +33,7 @@ module {
 
     // lo = buf[0 .. n-1]: n elements at offset 0.
     // hi = buf[n .. 2047]: (2048-n) elements at dynamic offset n.
-    // MLIR structural guarantee: hi.offset (%n) == lo.size (%n) → non-overlapping.
+    // MLIR structural guarantee: hi.offset (%n) == lo.size (%n) -> non-overlapping.
     %lo = memref.subview %buf[0][%n][1]
       : memref<2048xf32> to memref<?xf32, strided<[1]>>
     %hi = memref.subview %buf[%n][%hi_size][1]

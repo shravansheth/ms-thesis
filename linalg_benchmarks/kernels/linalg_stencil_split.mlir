@@ -25,7 +25,7 @@ module {
   // assume they may overlap and refuses to issue SIMD loads + stores.
   //
   // With !alias.scope / !noalias metadata the vectorizer knows lo and hi are
-  // disjoint → emits SIMD vector loads/stores → significant throughput gain
+  // disjoint -> emits SIMD vector loads/stores -> significant throughput gain
   // on Apple Silicon (NEON) and ARMv8 targets.
   //
   // Represents: element-wise kernel (copy+arithmetic) between input/output

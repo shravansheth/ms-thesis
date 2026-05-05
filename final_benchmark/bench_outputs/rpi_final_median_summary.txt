@@ -1,0 +1,15 @@
+rpi3b imex_softmax repeats=5 baseline_median=3933246.82 pass_median=3932602.40 speedup=1.000 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi3b iree_bias_add repeats=5 baseline_median=213779104.05 pass_median=208461218.65 speedup=1.026 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+rpi3b polybench_atax repeats=5 baseline_median=227974.45 pass_median=182025.05 speedup=1.252 checksum_baseline=30296.125168 checksum_pass=30296.125168
+rpi3b polybench_bicg repeats=5 baseline_median=291970.05 pass_median=291982.97 speedup=1.000 checksum_baseline=3727.792479 checksum_pass=3727.792479
+rpi3b polybench_mvt repeats=5 baseline_median=230021.46 pass_median=230054.04 speedup=1.000 checksum_baseline=35622249.951636 checksum_pass=35622249.951636
+rpi4b imex_softmax repeats=5 baseline_median=892511.78 pass_median=807051.83 speedup=1.106 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi4b iree_bias_add repeats=5 baseline_median=79222053.65 pass_median=75150564.80 speedup=1.054 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+rpi4b polybench_atax repeats=5 baseline_median=60899.98 pass_median=41423.90 speedup=1.470 checksum_baseline=30296.125168 checksum_pass=30296.125168
+rpi4b polybench_bicg repeats=5 baseline_median=106128.54 pass_median=50655.76 speedup=2.095 checksum_baseline=3727.792479 checksum_pass=3727.792479
+rpi4b polybench_mvt repeats=5 baseline_median=62273.12 pass_median=62288.04 speedup=1.000 checksum_baseline=35622249.951636 checksum_pass=35622249.951636
+rpi5 imex_softmax repeats=5 baseline_median=226943.70 pass_median=202007.39 speedup=1.123 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi5 iree_bias_add repeats=5 baseline_median=27963592.55 pass_median=29509433.30 speedup=0.948 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+rpi5 polybench_atax repeats=5 baseline_median=27788.82 pass_median=18417.06 speedup=1.509 checksum_baseline=30296.125168 checksum_pass=30296.125168
+rpi5 polybench_bicg repeats=5 baseline_median=46999.28 pass_median=22051.73 speedup=2.131 checksum_baseline=3727.792479 checksum_pass=3727.792479
+rpi5 polybench_mvt repeats=5 baseline_median=28303.89 pass_median=28304.19 speedup=1.000 checksum_baseline=35622249.951636 checksum_pass=35622249.951636

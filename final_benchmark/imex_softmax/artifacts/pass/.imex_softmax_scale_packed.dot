@@ -1,0 +1,18 @@
+digraph "CFG for 'imex_softmax_scale_packed' function" {
+	label="CFG for 'imex_softmax_scale_packed' function";
+
+	Node0x10a8e7710 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{9:\l|  %10 = icmp sgt i64 %7, 0\l  br i1 %10, label %.preheader.lr.ph, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10a8e7710:s0 -> Node0x10a8eabd0;
+	Node0x10a8e7710:s1 -> Node0x10a8ead50;
+	Node0x10a8eabd0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#ec7f6370" fontname="Courier",label="{.preheader.lr.ph:\l|  %11 = getelementptr float, ptr %1, i64 %8\l  br label %.preheader\l}"];
+	Node0x10a8eabd0 -> Node0x10a8eb220;
+	Node0x10a8eb220 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.preheader:\l|  %12 = phi i64 [ 0, %.preheader.lr.ph ], [ %25, %24 ]\l  %13 = shl nuw nsw i64 %12, 11\l  %14 = getelementptr inbounds nuw float, ptr %1, i64 %13\l  %15 = load float, ptr %14, align 4, !alias.scope !1\l  %16 = getelementptr inbounds nuw float, ptr %11, i64 %13\l  br label %17\l}"];
+	Node0x10a8eb220 -> Node0x10a8eb700;
+	Node0x10a8eb700 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{17:\l|  %18 = phi i64 [ 0, %.preheader ], [ %22, %17 ]\l  %19 = getelementptr inbounds nuw float, ptr %16, i64 %18\l  %20 = load float, ptr %19, align 4, !noalias !1\l  %21 = fdiv float %20, %15\l  store float %21, ptr %19, align 4, !noalias !1\l  %22 = add nuw nsw i64 %18, 1\l  %23 = icmp samesign ult i64 %18, 1023\l  br i1 %23, label %17, label %24\l|{<s0>T|<s1>F}}"];
+	Node0x10a8eb700:s0 -> Node0x10a8eb700;
+	Node0x10a8eb700:s1 -> Node0x10a8eb330;
+	Node0x10a8eb330 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{24:\l|  %25 = add nuw nsw i64 %12, 1\l  %26 = icmp slt i64 %25, %7\l  br i1 %26, label %.preheader, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10a8eb330:s0 -> Node0x10a8eb220;
+	Node0x10a8eb330:s1 -> Node0x10a8ead50;
+	Node0x10a8ead50 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{._crit_edge:\l|  ret void\l}"];
+}

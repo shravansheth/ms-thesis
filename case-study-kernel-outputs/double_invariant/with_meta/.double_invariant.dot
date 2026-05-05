@@ -1,0 +1,13 @@
+digraph "CFG for 'double_invariant' function" {
+	label="CFG for 'double_invariant' function";
+
+	Node0x10c44b010 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{6:\l|  %7 = sub i64 2048, %5\l  store float 1.000000e+00, ptr %1, align 4, !alias.scope !1\l  %8 = getelementptr inbounds nuw i8, ptr %1, i64 4\l  store float 2.000000e+00, ptr %8, align 4, !alias.scope !1\l  %9 = icmp sgt i64 %7, 0\l  br i1 %9, label %.lr.ph, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10c44b010:s0 -> Node0x10c44f1c0;
+	Node0x10c44b010:s1 -> Node0x10c44f340;
+	Node0x10c44f1c0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph:\l|  %10 = getelementptr float, ptr %1, i64 %5\l  br label %11\l}"];
+	Node0x10c44f1c0 -> Node0x10c44f4a0;
+	Node0x10c44f4a0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{11:\l|  %12 = phi i64 [ 0, %.lr.ph ], [ %17, %11 ]\l  %13 = getelementptr inbounds nuw float, ptr %10, i64 %12\l  %14 = load float, ptr %13, align 4, !noalias !1\l  %15 = fadd float %14, 1.000000e+00\l  %16 = fadd float %15, 2.000000e+00\l  store float %16, ptr %13, align 4, !noalias !1\l  %17 = add nuw nsw i64 %12, 1\l  %18 = icmp slt i64 %17, %7\l  br i1 %18, label %11, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10c44f4a0:s0 -> Node0x10c44f4a0;
+	Node0x10c44f4a0:s1 -> Node0x10c44f340;
+	Node0x10c44f340 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{._crit_edge:\l|  ret void\l}"];
+}

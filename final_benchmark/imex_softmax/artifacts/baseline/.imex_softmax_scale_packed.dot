@@ -1,0 +1,16 @@
+digraph "CFG for 'imex_softmax_scale_packed' function" {
+	label="CFG for 'imex_softmax_scale_packed' function";
+
+	Node0x10ab9b360 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{9:\l|  %10 = icmp sgt i64 %7, 0\l  br i1 %10, label %.preheader, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10ab9b360:s0 -> Node0x10ab9b3b0;
+	Node0x10ab9b360:s1 -> Node0x10ab9e6c0;
+	Node0x10ab9b3b0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.preheader:\l|  %11 = phi i64 [ %23, %22 ], [ 0, %9 ]\l  %.idx = shl nuw nsw i64 %11, 13\l  %12 = getelementptr inbounds nuw i8, ptr %1, i64 %.idx\l  %13 = getelementptr float, ptr %12, i64 %8\l  br label %14\l}"];
+	Node0x10ab9b3b0 -> Node0x10ab9eda0;
+	Node0x10ab9eda0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{14:\l|  %15 = phi i64 [ 0, %.preheader ], [ %20, %14 ]\l  %16 = load float, ptr %12, align 4\l  %17 = getelementptr float, ptr %13, i64 %15\l  %18 = load float, ptr %17, align 4\l  %19 = fdiv float %18, %16\l  store float %19, ptr %17, align 4\l  %20 = add nuw nsw i64 %15, 1\l  %21 = icmp samesign ult i64 %15, 1023\l  br i1 %21, label %14, label %22\l|{<s0>T|<s1>F}}"];
+	Node0x10ab9eda0:s0 -> Node0x10ab9eda0;
+	Node0x10ab9eda0:s1 -> Node0x10ab9e820;
+	Node0x10ab9e820 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{22:\l|  %23 = add nuw nsw i64 %11, 1\l  %24 = icmp slt i64 %23, %7\l  br i1 %24, label %.preheader, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10ab9e820:s0 -> Node0x10ab9b3b0;
+	Node0x10ab9e820:s1 -> Node0x10ab9e6c0;
+	Node0x10ab9e6c0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{._crit_edge:\l|  ret void\l}"];
+}

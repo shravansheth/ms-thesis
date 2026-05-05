@@ -1,0 +1,26 @@
+digraph "CFG for 'kernel_bicg' function" {
+	label="CFG for 'kernel_bicg' function";
+
+	Node0x10c7778c0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{27:\l|  %28 = icmp sgt i32 %0, 0\l  br i1 %28, label %.lr.ph, label %.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x10c7778c0:s0 -> Node0x10c77a540;
+	Node0x10c7778c0:s1 -> Node0x10c77adb0;
+	Node0x10c77a540 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{.lr.ph:\l|  %29 = getelementptr float, ptr %8, i64 %9\l  %30 = zext nneg i32 %0 to i64\l  %31 = shl nuw nsw i64 %30, 2\l  tail call void @llvm.memset.p0.i64(ptr align 4 %29, i8 0, i64 %31, i1 false)\l  br label %.preheader\l}"];
+	Node0x10c77a540 -> Node0x10c77adb0;
+	Node0x10c77adb0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{.preheader:\l|  %32 = icmp sgt i32 %1, 0\l  br i1 %32, label %.lr.ph156, label %._crit_edge157\l|{<s0>T|<s1>F}}"];
+	Node0x10c77adb0:s0 -> Node0x10c77b3a0;
+	Node0x10c77adb0:s1 -> Node0x10c77b440;
+	Node0x10c77b3a0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{.lr.ph156:\l|  %33 = getelementptr float, ptr %13, i64 %14\l  %34 = getelementptr float, ptr %8, i64 %9\l  %35 = getelementptr float, ptr %23, i64 %24\l  %36 = getelementptr float, ptr %18, i64 %19\l  %wide.trip.count163 = zext nneg i32 %1 to i64\l  %wide.trip.count = zext nneg i32 %0 to i64\l  br label %37\l}"];
+	Node0x10c77b3a0 -> Node0x10c77bb90;
+	Node0x10c77bb90 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{37:\l|  %indvars.iv160 = phi i64 [ 0, %.lr.ph156 ], [ %indvars.iv.next161,\l... %._crit_edge ]\l  %38 = getelementptr inbounds nuw float, ptr %33, i64 %indvars.iv160\l  store float 0.000000e+00, ptr %38, align 4\l  br i1 %28, label %.lr.ph154, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x10c77bb90:s0 -> Node0x10c77bdf0;
+	Node0x10c77bb90:s1 -> Node0x10c77bca0;
+	Node0x10c77bdf0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.lr.ph154:\l|  %39 = getelementptr inbounds nuw float, ptr %35, i64 %indvars.iv160\l  %40 = getelementptr float, ptr %3, i64 %indvars.iv160\l  br label %41\l}"];
+	Node0x10c77bdf0 -> Node0x10c77bf50;
+	Node0x10c77bf50 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{41:\l|  %indvars.iv = phi i64 [ 0, %.lr.ph154 ], [ %indvars.iv.next, %41 ]\l  %42 = getelementptr inbounds nuw float, ptr %34, i64 %indvars.iv\l  %43 = load float, ptr %42, align 4\l  %44 = load float, ptr %39, align 4\l  %45 = getelementptr float, ptr %40, i64 %indvars.iv\l  %46 = load float, ptr %45, align 4\l  %47 = fmul float %44, %46\l  %48 = fadd float %43, %47\l  store float %48, ptr %42, align 4\l  %49 = load float, ptr %38, align 4\l  %50 = load float, ptr %45, align 4\l  %51 = getelementptr inbounds nuw float, ptr %36, i64 %indvars.iv\l  %52 = load float, ptr %51, align 4\l  %53 = fmul float %50, %52\l  %54 = fadd float %49, %53\l  store float %54, ptr %38, align 4\l  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1\l  %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count\l  br i1 %exitcond.not, label %._crit_edge, label %41\l|{<s0>T|<s1>F}}"];
+	Node0x10c77bf50:s0 -> Node0x10c77bca0;
+	Node0x10c77bf50:s1 -> Node0x10c77bf50;
+	Node0x10c77bca0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d24b4070" fontname="Courier",label="{._crit_edge:\l|  %indvars.iv.next161 = add nuw nsw i64 %indvars.iv160, 1\l  %exitcond164.not = icmp eq i64 %indvars.iv.next161, %wide.trip.count163\l  br i1 %exitcond164.not, label %._crit_edge157, label %37\l|{<s0>T|<s1>F}}"];
+	Node0x10c77bca0:s0 -> Node0x10c77b440;
+	Node0x10c77bca0:s1 -> Node0x10c77bb90;
+	Node0x10c77b440 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e8765c70" fontname="Courier",label="{._crit_edge157:\l|  ret void\l}"];
+}

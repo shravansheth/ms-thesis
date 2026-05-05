@@ -1,0 +1,62 @@
+{
+    "function_name": "main",
+    "flat_args": [
+        {
+            "Formula": {
+                "shape": [
+                    997,
+                    997
+                ],
+                "dtype": "float32",
+                "coeff": 1,
+                "offset": 0
+            }
+        },
+        {
+            "Formula": {
+                "shape": [
+                    997,
+                    997
+                ],
+                "dtype": "float32",
+                "coeff": 1,
+                "offset": 0
+            }
+        },
+        {
+            "Formula": {
+                "shape": [
+                    997,
+                    997
+                ],
+                "dtype": "float32",
+                "coeff": 1,
+                "offset": 0
+            }
+        },
+        {
+            "Formula": {
+                "shape": [
+                    997,
+                    997
+                ],
+                "dtype": "float32",
+                "coeff": 1,
+                "offset": 0
+            }
+        }
+    ],
+    "seed": 17,
+    "rtol": 1e-05,
+    "atol": 1e-08,
+    "equal_nan": false,
+    "mode": "compare",
+    "file_name": "test.mlir",
+    "vmfb_name": "out.vmfb",
+    "expected_output": [
+        {
+            "url": "https://sharkpublic.blob.core.windows.net/sharkpublic/eochoalo/InterestingShapesBiasAdd/997x997xf32_TN_bias/expected_result_0.npy",
+            "value": null
+        }
+    ]
+}

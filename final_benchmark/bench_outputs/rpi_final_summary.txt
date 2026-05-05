@@ -1,0 +1,15 @@
+rpi3b polybench_atax baseline=228044.79 pass=182088.72 speedup=1.25 checksum_baseline=30296.125168 checksum_pass=30296.125168
+rpi3b polybench_bicg baseline=292071.93 pass=292036.15 speedup=1.00 checksum_baseline=3727.792479 checksum_pass=3727.792479
+rpi3b imex_softmax baseline=3933238.70 pass=3932602.45 speedup=1.00 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi3b polybench_mvt baseline=230028.72 pass=230046.90 speedup=1.00 checksum_baseline=35622249.951636 checksum_pass=35622249.951636
+rpi3b iree_bias_add baseline=209209192.65 pass=204009307.20 speedup=1.03 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+rpi4b polybench_atax baseline=63400.05 pass=41426.26 speedup=1.53 checksum_baseline=30296.125168 checksum_pass=30296.125168
+rpi4b polybench_bicg baseline=106168.17 pass=50650.76 speedup=2.10 checksum_baseline=3727.792479 checksum_pass=3727.792479
+rpi4b imex_softmax baseline=927325.48 pass=799358.04 speedup=1.16 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi4b polybench_mvt baseline=62268.05 pass=62267.04 speedup=1.00 checksum_baseline=35622249.951636 checksum_pass=35622249.951636
+rpi4b iree_bias_add baseline=80278642.55 pass=75177327.75 speedup=1.07 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+rpi5 polybench_atax baseline=27790.32 pass=18417.64 speedup=1.51 checksum_baseline=30296.125168 checksum_pass=30296.125168
+rpi5 polybench_bicg baseline=47016.67 pass=22051.85 speedup=2.13 checksum_baseline=3727.792479 checksum_pass=3727.792479
+rpi5 imex_softmax baseline=231791.32 pass=202524.55 speedup=1.14 checksum_baseline=512.000000 checksum_pass=512.000000
+rpi5 polybench_mvt baseline=28305.17 pass=28310.03 speedup=1.00 checksum_baseline=35622249.951636 checksum_pass=35622249.951636
+rpi5 iree_bias_add baseline=28314304.60 pass=29780683.30 speedup=0.95 checksum_baseline=17825736.000000 checksum_pass=17825736.000000

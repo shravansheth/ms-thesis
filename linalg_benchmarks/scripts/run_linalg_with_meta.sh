@@ -24,7 +24,7 @@ OUTDIR="$(dirname "$PREFIX")"
 BASENAME="$(basename "$PREFIX")"
 mkdir -p "$OUTDIR"
 
-# Step 1: lower linalg.generic → scf loops
+# Step 1: lower linalg.generic -> scf loops
 "$MLIR_OPT" "$INPUT" --convert-linalg-to-loops \
   -o "${PREFIX}.loops.mlir"
 
@@ -53,7 +53,7 @@ mkdir -p "$OUTDIR"
   -reconcile-unrealized-casts \
   -o "${PREFIX}.llvm_dialect.mlir"
 
-# Step 4: LLVM dialect → LLVM IR
+# Step 4: LLVM dialect -> LLVM IR
 "$MLIR_TRANSLATE" --mlir-to-llvmir \
   "${PREFIX}.llvm_dialect.mlir" \
   -o "${PREFIX}.ll"

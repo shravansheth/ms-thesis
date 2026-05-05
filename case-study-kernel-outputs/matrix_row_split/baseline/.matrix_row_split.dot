@@ -1,0 +1,16 @@
+digraph "CFG for 'matrix_row_split' function" {
+	label="CFG for 'matrix_row_split' function";
+
+	Node0x1087eaf10 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{8:\l|  store float 1.000000e+00, ptr %1, align 4\l  %9 = icmp sgt i64 %7, 0\l  br i1 %9, label %.preheader, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x1087eaf10:s0 -> Node0x1087eeee0;
+	Node0x1087eaf10:s1 -> Node0x1087ef060;
+	Node0x1087eeee0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{.preheader:\l|  %10 = phi i64 [ %24, %23 ], [ 0, %8 ]\l  %.idx = shl nuw nsw i64 %10, 11\l  %11 = getelementptr inbounds nuw i8, ptr %1, i64 %.idx\l  %12 = add nuw i64 %10, %7\l  %.idx1 = shl nuw nsw i64 %12, 11\l  %13 = getelementptr inbounds nuw i8, ptr %1, i64 %.idx1\l  br label %14\l}"];
+	Node0x1087eeee0 -> Node0x1087ef4d0;
+	Node0x1087ef4d0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{14:\l|  %15 = phi i64 [ 0, %.preheader ], [ %21, %14 ]\l  %16 = load float, ptr %1, align 4\l  %17 = getelementptr inbounds nuw float, ptr %11, i64 %15\l  %18 = load float, ptr %17, align 4\l  %19 = fadd float %16, %18\l  %20 = getelementptr inbounds nuw float, ptr %13, i64 %15\l  store float %19, ptr %20, align 4\l  %21 = add nuw nsw i64 %15, 1\l  %22 = icmp samesign ult i64 %15, 511\l  br i1 %22, label %14, label %23\l|{<s0>T|<s1>F}}"];
+	Node0x1087ef4d0:s0 -> Node0x1087ef4d0;
+	Node0x1087ef4d0:s1 -> Node0x1087ef1c0;
+	Node0x1087ef1c0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#d6524470" fontname="Courier",label="{23:\l|  %24 = add nuw nsw i64 %10, 1\l  %25 = icmp slt i64 %24, %7\l  br i1 %25, label %.preheader, label %._crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x1087ef1c0:s0 -> Node0x1087eeee0;
+	Node0x1087ef1c0:s1 -> Node0x1087ef060;
+	Node0x1087ef060 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#e97a5f70" fontname="Courier",label="{._crit_edge:\l|  ret void\l}"];
+}

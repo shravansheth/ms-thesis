@@ -24,11 +24,11 @@ OUTDIR="$(dirname "$PREFIX")"
 BASENAME="$(basename "$PREFIX")"
 mkdir -p "$OUTDIR"
 
-# Step 1: lower linalg.generic → scf loops (mlir-opt has linalg dialect)
+# Step 1: lower linalg.generic -> scf loops (mlir-opt has linalg dialect)
 "$MLIR_OPT" "$INPUT" --convert-linalg-to-loops \
   -o "${PREFIX}.loops.mlir"
 
-# Step 2: standard CPU lowering (no linalg in alias-meta-opt — handled by mlir-opt here)
+# Step 2: standard CPU lowering (no linalg in alias-meta-opt - handled by mlir-opt here)
 "$MLIR_OPT" "${PREFIX}.loops.mlir" \
   -convert-scf-to-cf \
   -memref-expand \
@@ -44,7 +44,7 @@ mkdir -p "$OUTDIR"
   -reconcile-unrealized-casts \
   -o "${PREFIX}.llvm_dialect.mlir"
 
-# Step 3: LLVM dialect → LLVM IR
+# Step 3: LLVM dialect -> LLVM IR
 "$MLIR_TRANSLATE" --mlir-to-llvmir \
   "${PREFIX}.llvm_dialect.mlir" \
   -o "${PREFIX}.ll"

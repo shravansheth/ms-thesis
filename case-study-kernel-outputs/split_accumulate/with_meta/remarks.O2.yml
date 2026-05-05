@@ -1,0 +1,14 @@
+--- !Missed
+Pass:            loop-vectorize
+Name:            VectorizationNotBeneficial
+Function:        split_accumulate
+Args:
+  - String:          the cost-model indicates that vectorization is not beneficial
+...
+--- !Missed
+Pass:            loop-vectorize
+Name:            InterleavingNotBeneficial
+Function:        split_accumulate
+Args:
+  - String:          the cost-model indicates that interleaving is not beneficial
+...

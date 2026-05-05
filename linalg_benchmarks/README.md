@@ -5,15 +5,15 @@
 The primary thesis validation uses six hand-written SCF kernels (`kernels/mlir/*.mlir`).
 These kernels write the `memref.subview` partition structure and the `scf.for` loops directly.
 
-This directory shows that the same partition-by-endpoint structural pattern — and the same
-alias-blocking problem — arises naturally from `linalg.generic` lowering. `linalg.generic`
+This directory shows that the same partition-by-endpoint structural pattern - and the same
+alias-blocking problem - arises naturally from `linalg.generic` lowering. `linalg.generic`
 is the central abstraction in ML compilers (IREE, TensorFlow MLIR, etc.): a compiler backend
 that produces `linalg.generic` for bias-add, normalization, and element-wise kernels will
 encounter the same alias-conservatism problem when lowering to LLVM IR, and the same pass
 resolves it.
 
 The two-step pipeline is:
-1. `mlir-opt --convert-linalg-to-loops` — lowers linalg.generic → scf.for + memref.load/store
+1. `mlir-opt --convert-linalg-to-loops` - lowers linalg.generic -> scf.for + memref.load/store
 2. Then the existing alias-meta-opt pass and standard lowering (unchanged)
 
 The pass does not need to know anything about linalg. It only cares about the resulting
@@ -51,20 +51,20 @@ linalg_benchmarks/
 
 ## Kernels
 
-### `linalg_scale_split.mlir` — Bias-Add (Form A)
+### `linalg_scale_split.mlir` - Bias-Add (Form A)
 
 **Algorithm**: scale all elements of a partition by the first element of the adjacent partition.
 Represents bias-add in a normalization layer: one scalar offset applied to an array.
 
 **Structure**:
 ```mlir
-%lo = memref.subview %buf[0][%n][1]      // lo = buf[0..n)  — scale factor at lo[0]
+%lo = memref.subview %buf[0][%n][1]      // lo = buf[0..n)  - scale factor at lo[0]
 %hi = memref.subview %buf[%n][%hi_size][1] // hi = buf[n..2048)
 linalg.generic { maps = [affine_map<(d0)->(0)>, affine_map<(d0)->(d0)>] }
   ins(%lo) outs(%hi) { hi[d0] += lo[0] }  // lo[0] is loop-invariant
 ```
 
-**Form A**: hi.offset (`%n`) == lo.size (`%n`) — same SSA value.
+**Form A**: hi.offset (`%n`) == lo.size (`%n`) - same SSA value.
 
 After `--convert-linalg-to-loops`:
 ```
@@ -78,7 +78,7 @@ LLVM cannot hoist `load lo[0]` because both lo and hi derive from the same base 
 The vectorizer also emits `UnsafeDep`: the invariant load at offset 0 could overlap with
 vectorized stores at offsets `[n, n+1, n+2, n+3]` if n < 3.
 
-### `linalg_norm_split.mlir` — Two-Stage Normalize (Form A)
+### `linalg_norm_split.mlir` - Two-Stage Normalize (Form A)
 
 **Algorithm**: normalize an array in two passes: (1) bias-add using lo[0]; (2) scale using lo[1].
 Represents a mean-subtract + scale-by-std normalization layer.
@@ -101,7 +101,7 @@ After lowering: two separate loops. In each loop, a different element of lo is l
 and LICM/GVN-blocked. Both `lo[0]` and `lo[1]` loads are alias-clobbered by `store hi[i]`
 from LLVM's perspective. The pass tags all uses of `%lo` in both loops, resolving both blocks.
 
-### `linalg_stencil_split.mlir` — Element-Wise Stencil (Form A)
+### `linalg_stencil_split.mlir` - Element-Wise Stencil (Form A)
 
 **Algorithm**: copy each element of the lo partition into the hi partition with arithmetic.
 Represents an element-wise kernel between input/output partitions of a single buffer.
@@ -152,7 +152,7 @@ The two-step linalg pipeline differs from the existing `run_pipeline_cpu_with_me
 in the added `--convert-linalg-to-loops` step at the front:
 
 ```
-mlir-opt --convert-linalg-to-loops         # linalg → scf + memref.load/store
+mlir-opt --convert-linalg-to-loops         # linalg -> scf + memref.load/store
 alias-meta-opt --mark-alias-groups \       # detect partition-by-endpoint pairs
                --lower-with-alias-meta     # emit alias.scope / noalias on llvm.load/store
 mlir-opt [standard CPU lowering passes]    # convert-scf-to-cf ... finalize-memref-to-llvm
@@ -209,13 +209,13 @@ in the stencil kernel.
 
 ## Key Finding
 
-The `linalg.generic` → SCF lowering (`--convert-linalg-to-loops`) preserves the
+The `linalg.generic` -> SCF lowering (`--convert-linalg-to-loops`) preserves the
 partition-by-endpoint structural invariant: the two `memref.subview` ops remain in the
 function with their SSA relationship intact after lowering. The pass detects and tags them
 identically to hand-written kernels.
 
 The critical indexing map pattern is `affine_map<(d0) -> (0)>` applied to a subview ins
-argument: this becomes `memref.load %subview[%c0]` in the loop body after lowering — a
+argument: this becomes `memref.load %subview[%c0]` in the loop body after lowering - a
 direct use of the subview result that `tagUsesOfValue` finds and tags correctly.
 
 The `affine_map<(d0) -> (d0)>` pattern (element-wise, same index) does NOT produce

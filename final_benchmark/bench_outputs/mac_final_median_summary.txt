@@ -1,0 +1,5 @@
+mac imex_softmax repeats=5 baseline_median=63769.50 pass_median=62416.25 speedup=1.022 checksum_baseline=512.000000 checksum_pass=512.000000
+mac iree_bias_add repeats=5 baseline_median=5084722.90 pass_median=5031425.00 speedup=1.011 checksum_baseline=17825736.000000 checksum_pass=17825736.000000
+mac polybench_atax repeats=5 baseline_median=11005.69 pass_median=7522.15 speedup=1.463 checksum_baseline=30296.125168 checksum_pass=30296.125168
+mac polybench_bicg repeats=5 baseline_median=8764.25 pass_median=8105.40 speedup=1.081 checksum_baseline=3727.792479 checksum_pass=3727.792479
+mac polybench_mvt repeats=5 baseline_median=9050.65 pass_median=8992.33 speedup=1.006 checksum_baseline=35622249.951636 checksum_pass=35622249.951636
