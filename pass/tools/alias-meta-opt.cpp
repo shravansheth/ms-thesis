@@ -58,6 +58,11 @@ static llvm::cl::opt<bool> markAliasGroups("mark-alias-groups",
                                             llvm::cl::desc("Run MarkAliasGroups pass"),
                                             llvm::cl::init(false));
 
+static llvm::cl::opt<bool>
+    materializePrefixSubviews("materialize-prefix-subviews",
+                              llvm::cl::desc("Run MaterializePrefixSubviews pass"),
+                              llvm::cl::init(false));
+
 static llvm::cl::opt<bool> lowerWithAliasMeta("lower-with-alias-meta",
                                                llvm::cl::desc("Run LowerWithAliasMeta pass"),
                                                llvm::cl::init(false));
@@ -97,6 +102,8 @@ int main(int argc, char **argv) {
   // Build the pass pipeline.
   PassManager pm(&context);
 
+  if (materializePrefixSubviews)
+    pm.addPass(alias_meta::createMaterializePrefixSubviews());
   if (markAliasGroups)
     pm.addPass(alias_meta::createMarkAliasGroups());
   if (lowerWithAliasMeta)

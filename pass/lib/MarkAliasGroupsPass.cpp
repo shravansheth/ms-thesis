@@ -18,8 +18,8 @@
 // the corresponding loads/stores inside the callee are tagged directly.
 //
 // Output attributes (discardable, no custom dialect needed):
-//   alias_meta.group_id  — IntegerAttr(i32): even=lo, odd=hi of pair N (2N/2N+1)
-//   alias_meta.role      — StringAttr: "lo" or "hi"
+//   alias_meta.group_id  - IntegerAttr(i32): even=lo, odd=hi of pair N (2N/2N+1)
+//   alias_meta.role      - StringAttr: "lo" or "hi"
 //
 //===----------------------------------------------------------------------===//
 
@@ -46,9 +46,7 @@ namespace alias_meta {
 
 namespace {
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 
 /// Attach the alias-group marker attributes to an op.
 static void tagOp(Operation *op, uint32_t groupId, StringRef role,
@@ -128,19 +126,43 @@ static bool isPartitionByEndpointDim(memref::SubViewOp lo,
 }
 
 /// Check whether (lo, hi) form a partition-by-endpoint pair.
-/// Checks dimension 0 (the primary split dimension for all our cases).
+/// A split in any dimension is sufficient: if one projected interval is
+/// adjacent and non-overlapping, the full subview regions are disjoint.
 static bool isPartitionByEndpoint(memref::SubViewOp lo,
                                   memref::SubViewOp hi) {
   if (lo.getSource() != hi.getSource())
     return false;
   if (lo.getMixedOffsets().size() != hi.getMixedOffsets().size())
     return false;
-  return isPartitionByEndpointDim(lo, hi, /*dim=*/0);
+
+  for (unsigned dim = 0, e = lo.getMixedOffsets().size(); dim < e; ++dim)
+    if (isPartitionByEndpointDim(lo, hi, dim))
+      return true;
+
+  return false;
+}
+
+static bool sameIndexValue(Value a, Value b) {
+  if (a == b)
+    return true;
+  auto aConst = a.getDefiningOp<arith::ConstantIndexOp>();
+  auto bConst = b.getDefiningOp<arith::ConstantIndexOp>();
+  return aConst && bConst && aConst.value() == bConst.value();
+}
+
+static bool sameIndices(ValueRange lhs, ValueRange rhs) {
+  if (lhs.size() != rhs.size())
+    return false;
+  for (auto [a, b] : llvm::zip_equal(lhs, rhs))
+    if (!sameIndexValue(a, b))
+      return false;
+  return true;
 }
 
 /// Walk all uses of `startVal`, tagging memref.load/store ops with the given
-/// group ID and role. Follows memref.cast chains. For noinline func.call ops,
-/// clones the callee (once per call site) and tags the clone's loads/stores.
+/// group ID and role. Follows view-preserving memref cast chains. For noinline
+/// func.call ops, clones the callee (once per call site) and tags the clone's
+/// loads/stores.
 ///
 /// `callSiteClones` maps a func.call Operation* to its already-created clone,
 /// ensuring that when both lo and hi tagUsesOfValue calls hit the same call
@@ -159,19 +181,57 @@ static void tagUsesOfValue(Value startVal, uint32_t groupId, StringRef role,
       continue;
 
     for (Operation *user : v.getUsers()) {
-      // Direct load/store — tag it.
-      if (isa<memref::LoadOp, memref::StoreOp>(user)) {
-        tagOp(user, groupId, role, ctx);
+      // Direct load/store: tag it.
+      if (auto loadOp = dyn_cast<memref::LoadOp>(user)) {
+        if (loadOp.getMemref() == v)
+          tagOp(user, groupId, role, ctx);
+        continue;
+      }
+      if (auto storeOp = dyn_cast<memref::StoreOp>(user)) {
+        if (storeOp.getMemref() == v) {
+          tagOp(user, groupId, role, ctx);
+          continue;
+        }
+
+        // ClangIR often stores pointer/memref arguments into one-slot allocas
+        // and reloads them inside the loop. Follow that descriptor traffic so
+        // the actual memory accesses through the reloaded memref are tagged.
+        if (storeOp.getValue() == v && isa<MemRefType>(v.getType())) {
+          Value slot = storeOp.getMemref();
+          for (Operation *slotUser : slot.getUsers()) {
+            auto reload = dyn_cast<memref::LoadOp>(slotUser);
+            if (!reload || reload.getMemref() != slot)
+              continue;
+            if (!sameIndices(storeOp.getIndices(), reload.getIndices()))
+              continue;
+            worklist.push_back(reload.getResult());
+          }
+        }
         continue;
       }
 
-      // Cast — follow through to the cast result.
+      // Cast: follow through to the cast result.
       if (auto castOp = dyn_cast<memref::CastOp>(user)) {
         worklist.push_back(castOp.getResult());
         continue;
       }
 
-      // Noinline call — clone the callee (once per call site) and tag the
+      // Reinterpret cast: ClangIR uses this to pass strided subviews to
+      // callees whose pointer-like ABI type is an identity-layout memref.
+      if (auto reinterpretOp = dyn_cast<memref::ReinterpretCastOp>(user)) {
+        worklist.push_back(reinterpretOp.getResult());
+        continue;
+      }
+
+      // Subview: any access through a subview of an already-proven region is
+      // still within that region.
+      if (auto subviewOp = dyn_cast<memref::SubViewOp>(user)) {
+        if (subviewOp.getSource() == v)
+          worklist.push_back(subviewOp.getResult());
+        continue;
+      }
+
+      // Noinline call: clone the callee (once per call site) and tag the
       // clone's argument uses. This avoids the soundness bug of tagging the
       // original callee, which would affect ALL call sites (even those where
       // the disjointness property does not hold).
@@ -224,19 +284,15 @@ static void tagUsesOfValue(Value startVal, uint32_t groupId, StringRef role,
           BlockArgument cloneArg = clonedFn.getArgument(idx);
           if (!isa<MemRefType>(cloneArg.getType()))
             continue;
-          for (Operation *cloneUser : cloneArg.getUsers()) {
-            if (isa<memref::LoadOp, memref::StoreOp>(cloneUser))
-              tagOp(cloneUser, groupId, role, ctx);
-          }
+          tagUsesOfValue(cloneArg, groupId, role, ctx, moduleOp,
+                         callSiteClones, cloneCounter);
         }
       }
     }
   }
 }
 
-// ---------------------------------------------------------------------------
 // Pass
-// ---------------------------------------------------------------------------
 
 class MarkAliasGroupsPass
     : public impl::MarkAliasGroupsBase<MarkAliasGroupsPass> {

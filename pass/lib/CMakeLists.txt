@@ -1,5 +1,6 @@
 add_mlir_library(AliasMetaPropagation
   MarkAliasGroupsPass.cpp
+  MaterializePrefixSubviewsPass.cpp
   LowerWithAliasMetaPass.cpp
 
   ADDITIONAL_HEADER_DIRS

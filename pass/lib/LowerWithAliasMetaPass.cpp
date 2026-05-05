@@ -13,8 +13,8 @@
 //   - For each disjoint pair N (group IDs 2N / 2N+1):
 //       * One AliasScopeDomainAttr is created.
 //       * One AliasScopeAttr (lo scope) is created in that domain.
-//       * lo-region loads/stores  → alias_scopes    = [lo_scope]
-//       * hi-region loads/stores  → noalias_scopes  = [lo_scope]
+//       * lo-region loads/stores  -> alias_scopes    = [lo_scope]
+//       * hi-region loads/stores  -> noalias_scopes  = [lo_scope]
 //   This mirrors the manual oracle structure validated in the case studies.
 //
 //===----------------------------------------------------------------------===//
@@ -44,19 +44,17 @@ namespace alias_meta {
 
 namespace {
 
-// ---------------------------------------------------------------------------
 // Alias scope info per disjoint pair
-// ---------------------------------------------------------------------------
 
 struct PairScopeInfo {
   LLVM::AliasScopeDomainAttr domain;
-  LLVM::AliasScopeAttr loScope; // lo region scope — hi region just noaliases it
+  LLVM::AliasScopeAttr loScope; // lo region scope; hi region noaliases it
 };
 
-// ---------------------------------------------------------------------------
 // Helper: build alias scope attributes for all pairs seen in the module
-// ---------------------------------------------------------------------------
 
+/// Builds alias scope attributes for every disjoint pair seen in the module.
+/// One AliasScopeDomainAttr and one AliasScopeAttr (lo scope) per pair.
 static DenseMap<uint32_t, PairScopeInfo>
 buildPairScopes(ModuleOp moduleOp, MLIRContext *ctx) {
   DenseMap<uint32_t, PairScopeInfo> pairScopes;
@@ -86,9 +84,7 @@ buildPairScopes(ModuleOp moduleOp, MLIRContext *ctx) {
   return pairScopes;
 }
 
-// ---------------------------------------------------------------------------
 // Conversion patterns
-// ---------------------------------------------------------------------------
 
 static constexpr LLVM::GEPNoWrapFlags kNoWrapFlags =
     LLVM::GEPNoWrapFlags::inbounds | LLVM::GEPNoWrapFlags::nuw;
@@ -102,7 +98,7 @@ static std::pair<uint32_t, bool> getPairInfo(Operation *op) {
   return {pairId, isLo};
 }
 
-/// Lower a tagged memref.load → llvm.load with alias scope metadata.
+/// Lower a tagged memref.load -> llvm.load with alias scope metadata.
 struct TaggedLoadLowering : public ConvertOpToLLVMPattern<memref::LoadOp> {
   TaggedLoadLowering(const LLVMTypeConverter &tc,
                      const DenseMap<uint32_t, PairScopeInfo> &scopes)
@@ -151,7 +147,7 @@ private:
   const DenseMap<uint32_t, PairScopeInfo> &pairScopes;
 };
 
-/// Lower a tagged memref.store → llvm.store with alias scope metadata.
+/// Lower a tagged memref.store -> llvm.store with alias scope metadata.
 struct TaggedStoreLowering : public ConvertOpToLLVMPattern<memref::StoreOp> {
   TaggedStoreLowering(const LLVMTypeConverter &tc,
                       const DenseMap<uint32_t, PairScopeInfo> &scopes)
@@ -194,9 +190,7 @@ private:
   const DenseMap<uint32_t, PairScopeInfo> &pairScopes;
 };
 
-// ---------------------------------------------------------------------------
 // Pass
-// ---------------------------------------------------------------------------
 
 class LowerWithAliasMetaPass
     : public impl::LowerWithAliasMetaBase<LowerWithAliasMetaPass> {
@@ -211,7 +205,7 @@ public:
     DenseMap<uint32_t, PairScopeInfo> pairScopes = buildPairScopes(moduleOp, ctx);
 
     if (pairScopes.empty()) {
-      LLVM_DEBUG(llvm::dbgs() << "  No tagged ops found — nothing to do.\n");
+      LLVM_DEBUG(llvm::dbgs() << "  No tagged ops found, nothing to do.\n");
       return;
     }
 
