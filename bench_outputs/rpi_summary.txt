@@ -1,8 +1,0 @@
-rpi5 dynamic_split baseline=758.01 pass=650.41 speedup=1.17
-rpi5 adjacent_tiles baseline=382.67 pass=330.55 speedup=1.16
-rpi5 matrix_row_split baseline=27860.68 pass=27878.20 speedup=1.00
-rpi5 subview_noalias baseline=468.04 pass=363.30 speedup=1.29
-rpi5 tiling_noinline baseline=385.79 pass=438.48 speedup=0.88
-rpi5 split_accumulate baseline=758.76 pass=651.36 speedup=1.16
-rpi5 double_invariant baseline=867.01 pass=864.95 speedup=1.00
-rpi5 vectorize_split baseline=638006.07 pass=501810.96 speedup=1.27

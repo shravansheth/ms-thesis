@@ -11,3 +11,9 @@
 .claude/
 prev_cases/
 pass/build/
+pass/.cache/
+
+benchmark_exploration/
+case-study-binaries/
+
+thesis-reference/

@@ -1,5 +1,0 @@
-digraph "CFG for 'caller' function" {
-	label="CFG for 'caller' function";
-
-	Node0x10b11fa50 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870" fontname="Courier",label="{0:\l|  %1 = tail call dereferenceable_or_null(4096) ptr @malloc(i64 4096)\l  store float 1.000000e+00, ptr %1, align 4\l  tail call void @kernel(ptr nonnull poison, ptr nonnull %1, i64 0, i64\l... poison, i64 poison, ptr nonnull poison, ptr nonnull %1, i64 512, i64 poison,\l... i64 poison) #4\l  tail call void @free(ptr %1)\l  ret void\l}"];
-}

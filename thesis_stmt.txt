@@ -1,8 +1,0 @@
-This thesis focuses on preserving provably disjoint memref subview semantics
-during MLIR-to-LLVM lowering for CPU targets. For a restricted subset of
-subviews (rank-1 (potentially rank-2), unit stride, statically known offsets/sizes, same base allocation, non-overlapping intervals), we detect disjointness at the MIR level before view canonicalization/expansion, and materialize it as LLVM instruction-
-level scoped alias metadata (!alias.scope / Inoalias) on the lowered
-Ilvm.load/Ilvm.store operations in Ilvm-dialect MLIR. We evaluate the approach on a
-micro-suite of kernels where LLVM's middle-end optimizations are blocked by alias
-conservatism in the baseline, and show that the emitted metadata unlocks
-optimizations without introducing a new general alias analysis.
